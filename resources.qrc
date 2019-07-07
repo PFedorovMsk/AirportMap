@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>src/map.qml</file>
+        <file>fonts/Roboto-Bold.ttf</file>
+        <file>fonts/Roboto-BoldItalic.ttf</file>
+        <file>fonts/Roboto-Italic.ttf</file>
+        <file>fonts/Roboto-Regular.ttf</file>
+        <file>fonts/RobotoMono-Bold.ttf</file>
+        <file>fonts/RobotoMono-BoldItalic.ttf</file>
+        <file>fonts/RobotoMono-Italic.ttf</file>
+        <file>fonts/RobotoMono-Regular.ttf</file>
+    </qresource>
+</RCC>
