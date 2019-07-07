@@ -9,10 +9,13 @@ Rectangle {
     height: 512
     visible: true
 
+    property variant topLeftRussia:     QtPositioning.coordinate(78.0, 19.0)
+    property variant bottomRightRussia: QtPositioning.coordinate(41.0, -169.0)
+    property variant viewOfRussia:      QtPositioning.rectangle(topLeftRussia, bottomRightRussia)
+
     Plugin {
         id: mapPlugin
-        name: "esri" // "mapboxgl", "esri", ...
-        // specify plugin parameters if necessary
+        name: "mapboxgl"   // "mapboxgl", "esri", ...
         // PluginParameter {
         //     name:
         //     value:
@@ -20,10 +23,10 @@ Rectangle {
     }
 
     Map {
+        id: map
         anchors.fill: parent
         plugin: mapPlugin
-        center: QtPositioning.coordinate(59.91, 10.75) // Oslo
-        zoomLevel: 2
+        visibleRegion: viewOfRussia
     }
 }
 
