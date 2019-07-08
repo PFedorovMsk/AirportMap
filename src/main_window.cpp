@@ -17,12 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
     initLayouts();
 
     QRect screenRect = QGuiApplication::primaryScreen()->availableGeometry();
-    int   d          = 50;
-    setGeometry(screenRect.x() + d, screenRect.y() + d, screenRect.width() - 2 * d, screenRect.height() - 2 * d);
+    int   dx         = 20;
+    int   dy         = 50;
+    setGeometry(screenRect.x() + dx, screenRect.y() + dy, screenRect.width() - 2 * dx, screenRect.height() - 2 * dy);
+    this->showMaximized();
 
-//    addCircle(60.0, 38.0, QColor(100, 100, 220, 128));
-//    addCircle(60.0, 40.0, QColor(220, 100, 100, 128));
-//    addCircle(60.2, 39.8, QColor(100, 220, 100, 128));
+    //    addCircle(60.0, 38.0, QColor(100, 100, 220, 128));
+    //    addCircle(60.0, 40.0, QColor(220, 100, 100, 128));
+    //    addCircle(60.2, 39.8, QColor(100, 220, 100, 128));
 }
 
 MainWindow::~MainWindow() {}
