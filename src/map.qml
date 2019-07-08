@@ -15,10 +15,11 @@ Rectangle {
 
     Plugin {
         id: mapPlugin
-        name: "mapboxgl"   // "mapboxgl", "esri", ...
+        name: "esri"
+        // name: "osm" // name: "mapboxgl"
         // PluginParameter {
-        //     name:
-        //     value:
+        //     name: "osm.mapping.host";
+        //     value: "http://a.tile.openstreetmap.org/"
         // }
     }
 
@@ -29,20 +30,31 @@ Rectangle {
         visibleRegion: viewOfRussia
     }
 
-    function addCircle(latitude, longitude, color) {
-        var circle = Qt.createQmlObject('import QtLocation 5.9; MapCircle { }', map, "dynamic")
+    function addCircle(latitude, longitude, color, borderColor, radius) {
+        var circle = Qt.createQmlObject('import QtQuick 2.9; Rectangle{ }', map)
         if (circle === null) {
-            console.log("error creating object" + circle.errorString())
+            console.log("Error creating object" + circle.errorString())
             return false
         }
-
-        circle.center = QtPositioning.coordinate(latitude, longitude)
-        circle.radius = 25000.0
         circle.color = color
-        circle.border.width = 1
+        circle.width = radius * 2
+        circle.height = radius * 2
+        circle.radius = radius
+        circle.border.widht = 1
+        circle.border.height = 1
+        circle.border.color = borderColor
+        circle.smooth = true
 
-        map.addMapItem(circle)
+        var item = Qt.createQmlObject('import QtQuick 2.9; import QtLocation 5.9; MapQuickItem{}', map, "dynamic")
+        if (item === null) {
+            console.log("Error creating object" + item.errorString())
+            return false
+        }
+        item.sourceItem = circle
+        item.anchorPoint.x = Qt.point(radius, radius)
+        item.coordinate = QtPositioning.coordinate(latitude, longitude);
+
+        map.addMapItem(item);
         return true
     }
 }
-
