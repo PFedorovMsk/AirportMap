@@ -1,6 +1,8 @@
 #include "main_window.h"
 
+#include <QColor>
 #include <QHBoxLayout>
+#include <QMetaObject>
 #include <QScreen>
 #include <QVBoxLayout>
 
@@ -15,7 +17,12 @@ MainWindow::MainWindow(QWidget *parent)
     initLayouts();
 
     QRect screenRect = QGuiApplication::primaryScreen()->availableGeometry();
-    setGeometry(screenRect.x() + 25, screenRect.y() + 50, this->minimumWidth(), this->minimumHeight());
+    int   d          = 50;
+    setGeometry(screenRect.x() + d, screenRect.y() + d, screenRect.width() - 2 * d, screenRect.height() - 2 * d);
+
+//    addCircle(60.0, 38.0, QColor(100, 100, 220, 128));
+//    addCircle(60.0, 40.0, QColor(220, 100, 100, 128));
+//    addCircle(60.2, 39.8, QColor(100, 220, 100, 128));
 }
 
 MainWindow::~MainWindow() {}
@@ -63,6 +70,13 @@ void MainWindow::initLayouts()
     centralWidget()->setMinimumWidth(3 * GuiConfig::LAYOUT_MARGIN_BIG + m_mapScene->minimumWidth() +
                                      m_controlPanel->minimumWidth());
     setMinimumWidth(this->layout()->margin() * 2 + centralWidget()->minimumWidth());
+}
+
+void MainWindow::addCircle(QVariant latitude, QVariant longitude, QVariant color)
+{
+    QVariant returnedValue;
+    QMetaObject::invokeMethod((QObject *)(m_mapScene->rootObject()), "addCircle", Q_RETURN_ARG(QVariant, returnedValue),
+                              Q_ARG(QVariant, latitude), Q_ARG(QVariant, longitude), Q_ARG(QVariant, color));
 }
 
 // slots:

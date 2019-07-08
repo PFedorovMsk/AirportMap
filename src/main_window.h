@@ -28,6 +28,7 @@ private:
     void loadFonts();
     void initControls();
     void initLayouts();
+    void addCircle(QVariant latitude, QVariant longitude, QVariant color);
 
 private:
     QQuickWidget *m_mapScene;

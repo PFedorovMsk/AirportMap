@@ -28,5 +28,21 @@ Rectangle {
         plugin: mapPlugin
         visibleRegion: viewOfRussia
     }
+
+    function addCircle(latitude, longitude, color) {
+        var circle = Qt.createQmlObject('import QtLocation 5.9; MapCircle { }', map, "dynamic")
+        if (circle === null) {
+            console.log("error creating object" + circle.errorString())
+            return false
+        }
+
+        circle.center = QtPositioning.coordinate(latitude, longitude)
+        circle.radius = 25000.0
+        circle.color = color
+        circle.border.width = 1
+
+        map.addMapItem(circle)
+        return true
+    }
 }
 
