@@ -22,7 +22,9 @@ MainWindow::MainWindow(QWidget *parent)
     setGeometry(screenRect.x() + dx, screenRect.y() + dy, screenRect.width() - 2 * dx, screenRect.height() - 2 * dy);
     this->showMaximized();
 
-    test(); // !!! потом удалить !!!
+    connect(m_controlPanel, SIGNAL(stateChanged()), this, SLOT(test()));
+    // для теста, потом удалить:
+    emit m_controlPanel->stateChanged();
 }
 
 MainWindow::~MainWindow() {}
@@ -87,8 +89,18 @@ void MainWindow::onClear() {}
 
 void MainWindow::test()
 {
-    QColor c1(100, 120, 200, 128);
-    QColor c2(100, 120, 200, 255);
+    QVariant returnedValue;
+    QMetaObject::invokeMethod((QObject *)(m_mapScene->rootObject()), "removeAllItems",
+                              Q_RETURN_ARG(QVariant, returnedValue));
+
+    StateOfParameters st = m_controlPanel->state();
+    QColor            c1 = st.airportsColor;
+    QColor            c2 = c1;
+    c2.setAlpha(255);
+    QColor c3 = st.heliportsColor;
+    QColor c4 = c3;
+    c4.setAlpha(255);
+
 
     struct Coord {
         double x;
@@ -162,7 +174,15 @@ void MainWindow::test()
         {44.0333, 145.85},  {46.9667, 142.733}, {63.3803, 105.671},   {53.6123, 114.039},  {62.0333, 129.733},
         {67.9046, 74.8566}, {58.3604, 66.6514}, {57.6167, 39.85}};
 
-    for (int i = 0; i < coordinates.count(); ++i) {
-        addCircle(coordinates[i].x, coordinates[i].y, c1, c2, 5);
+    if (st.showAirports) {
+        for (int i = 0; i < coordinates.count() / 2; ++i) {
+            addCircle(coordinates[i].x, coordinates[i].y, c1, c2, 6);
+        }
+    }
+
+    if (st.showHeliports) {
+        for (int i = coordinates.count() / 2 + 1; i < coordinates.count(); ++i) {
+            addCircle(coordinates[i].x, coordinates[i].y, c3, c4, 6);
+        }
     }
 }

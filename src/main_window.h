@@ -23,14 +23,13 @@ signals:
 
 private slots:
     void onClear();
+    void test();
 
 private:
     void loadFonts();
     void initControls();
     void initLayouts();
     void addCircle(QVariant latitude, QVariant longitude, QVariant color, QVariant borderColor, QVariant radius);
-
-    void test();
 
 private:
     QQuickWidget *m_mapScene;

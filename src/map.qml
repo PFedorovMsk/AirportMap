@@ -57,4 +57,8 @@ Rectangle {
         map.addMapItem(item);
         return true
     }
+
+    function removeAllItems() {
+        map.clearMapItems()
+    }
 }
