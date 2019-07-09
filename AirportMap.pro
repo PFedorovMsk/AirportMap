@@ -15,12 +15,14 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 SOURCES += \
+    src/color_select_button.cpp \
     src/control_panel.cpp \
     src/font_manager.cc \
     src/main.cpp \
     src/main_window.cpp
 
 HEADERS += \
+    src/color_select_button.h \
     src/control_panel.h \
     src/font_manager.h \
     src/gui_config.h \

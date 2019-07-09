@@ -296,7 +296,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btnAirportsColor">
+         <widget class="ColorSelectButton" name="btnAirportsColor">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -336,7 +336,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btnAirportsFinancingColor">
+         <widget class="ColorSelectButton" name="btnAirportsFinancingColor">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -376,7 +376,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btnAirportsTrafficColor">
+         <widget class="ColorSelectButton" name="btnAirportsTrafficColor">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -459,7 +459,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btnHeliportsColor">
+         <widget class="ColorSelectButton" name="btnHeliportsColor">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -491,6 +491,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ColorSelectButton</class>
+   <extends>QPushButton</extends>
+   <header>src/color_select_button.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
