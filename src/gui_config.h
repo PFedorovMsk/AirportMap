@@ -53,8 +53,8 @@ public:
 class GuiConfig
 {
 public:
-    static constexpr int FONT_SIZE_SMALL  = 9;
-    static constexpr int FONT_SIZE_NORMAL = 10;
+    static constexpr int FONT_SIZE_SMALL  = 8;
+    static constexpr int FONT_SIZE_NORMAL = 9;
     static constexpr int FONT_SIZE_BIG    = 11;
     static constexpr int FONT_SIZE_LARGE  = 13;
     static constexpr int FONT_SIZE_HUGE   = 15;

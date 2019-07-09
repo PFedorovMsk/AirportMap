@@ -1,23 +1,25 @@
 #ifndef CONTROL_PANEL_H
 #define CONTROL_PANEL_H
 
-#include <QCheckBox>
 #include <QGroupBox>
-#include <QWidget>
 
+
+namespace Ui
+{
+class ControlPanel;
+}
 
 class ControlPanel : public QGroupBox
 {
+    Q_OBJECT
+
 public:
     explicit ControlPanel(QWidget *parent = nullptr);
-    ~ControlPanel() override;
+    ~ControlPanel();
 
 private:
-    void initControls();
-    void initLayouts();
-
-    QCheckBox *m_cbShowAirpots;
-    QCheckBox *m_cbShowHeliports;
+    Ui::ControlPanel *ui;
 };
+
 
 #endif // CONTROL_PANEL_H

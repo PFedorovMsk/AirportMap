@@ -28,3 +28,6 @@ HEADERS += \
 
 RESOURCES += \
     resources.qrc
+
+FORMS += \
+    src/control_panel.ui
