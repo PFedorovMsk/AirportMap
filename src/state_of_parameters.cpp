@@ -1,0 +1,32 @@
+#include "state_of_parameters.h"
+
+
+StateOfParameters::StateOfParameters()
+    : showAirports(true)
+    , showAirportsInternational(true)
+    , showAirportsDomestic(true)
+    , showAirportsWithHardCoverOfRunway(true)
+    , showAirportsWithGroundCoverOfRunway(true)
+    , showAirportsWithRunwayType1(true)
+    , showAirportsWithRunwayType2(true)
+    , showAirportsWithRunwayType3(true)
+    , showAirportsWithRunwayType4(true)
+    , showAirportsWithRunwayType5(true)
+    , showAirportsWithRunwayType6(true)
+    , showAirportsWithRunwayTypeNo(true)
+    , showAirportsWithConstantLighting(true)
+    , showAirportsWithLightingByRequest(true)
+    , showAirportsWithoutLighting(true)
+    , showAirportsOnlyForRegion(false)
+    , airportsRegion("")
+    , airportsColor(QColor(128, 128, 255, 128))
+    , showAirportsFinancing(false)
+    , airportsFinancingColor(QColor(192, 192, 64, 128))
+    , showAirportsTraffic(false)
+    , airportsTrafficColor(QColor(192, 64, 192, 128))
+    , showHeliports(true)
+    , showHeliportsOnlyForRegion(false)
+    , heliportsRegion("")
+    , heliportsColor(QColor(255, 128, 128, 128))
+{
+}

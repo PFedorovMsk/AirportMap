@@ -19,14 +19,16 @@ SOURCES += \
     src/control_panel.cpp \
     src/font_manager.cc \
     src/main.cpp \
-    src/main_window.cpp
+    src/main_window.cpp \
+    src/state_of_parameters.cpp
 
 HEADERS += \
     src/color_select_button.h \
     src/control_panel.h \
     src/font_manager.h \
     src/gui_config.h \
-    src/main_window.h
+    src/main_window.h \
+    src/state_of_parameters.h
 
 RESOURCES += \
     resources.qrc
