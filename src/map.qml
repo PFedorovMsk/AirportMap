@@ -15,12 +15,11 @@ Rectangle {
 
     Plugin {
         id: mapPlugin
-        name: "esri"
-        // name: "osm" // name: "mapboxgl"
-        // PluginParameter {
-        //     name: "osm.mapping.host";
-        //     value: "http://a.tile.openstreetmap.org/"
-        // }
+        name: "osm"
+        PluginParameter {
+//            name: "osm.mapping.host"
+//            value: "http://a.tile.openstreetmap.org/"
+        }
     }
 
     Map {
@@ -28,37 +27,48 @@ Rectangle {
         anchors.fill: parent
         plugin: mapPlugin
         visibleRegion: viewOfRussia
-    }
+        maximumZoomLevel: 11
 
-    function addCircle(latitude, longitude, color, borderColor, radius) {
-        var circle = Qt.createQmlObject('import QtQuick 2.9; Rectangle{ }', map)
-        if (circle === null) {
-            console.log("Error creating object" + circle.errorString())
-            return false
+        MapItemView {
+            id: airportsView
+            model: airport_model
+
+            delegate: MapQuickItem {
+                coordinate: QtPositioning.coordinate(model.air_latitude, model.air_longitude)
+                anchorPoint.x: rect.width/2
+                anchorPoint.y: rect.height
+
+                sourceItem: Rectangle {
+                    id: rect
+                    color: model.color
+                    radius: model.radius
+                    width: radius * 2
+                    height: radius * 2
+                    border.width: 1
+                    border.color: model.borderColor
+                    smooth: true
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    Text {
+                        id: tmpText
+                        visible: false
+                        text: model.name_ru
+                        anchors.bottom: parent.top
+                        color: "black"
+                        font.pointSize: 11
+                        antialiasing: true
+                    }
+                    onEntered: {
+                        tmpText.visible = true
+                    }
+                    onExited: {
+                        tmpText.visible = false
+                    }
+                }
+            }
         }
-        circle.color = color
-        circle.width = radius * 2
-        circle.height = radius * 2
-        circle.radius = radius
-        circle.border.widht = 1
-        circle.border.height = 1
-        circle.border.color = borderColor
-        circle.smooth = true
-
-        var item = Qt.createQmlObject('import QtQuick 2.9; import QtLocation 5.9; MapQuickItem{}', map, "dynamic")
-        if (item === null) {
-            console.log("Error creating object" + item.errorString())
-            return false
-        }
-        item.sourceItem = circle
-        item.anchorPoint.x = Qt.point(radius, radius)
-        item.coordinate = QtPositioning.coordinate(latitude, longitude);
-
-        map.addMapItem(item);
-        return true
-    }
-
-    function removeAllItems() {
-        map.clearMapItems()
     }
 }
