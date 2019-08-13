@@ -16,10 +16,10 @@ Rectangle {
     Plugin {
         id: mapPlugin
         name: "osm"
-        PluginParameter {
+//        PluginParameter {
 //            name: "osm.mapping.host"
 //            value: "http://a.tile.openstreetmap.org/"
-        }
+//        }
     }
 
     Map {
