@@ -4,11 +4,19 @@
 #include <QGroupBox>
 #include "state_of_parameters.h"
 
+#include <QSqlQueryModel>
+#include <QSqlDatabase>
+
 
 namespace Ui
 {
 class ControlPanel;
 }
+
+struct TwoLevelTreeItems {
+    QVector<QString> topLevels;
+    QVector<QVector<QString>> childrens;
+};
 
 class ControlPanel : public QGroupBox
 {
@@ -19,6 +27,8 @@ public:
     ~ControlPanel();
 
     const StateOfParameters& state() const;
+
+    void setRegionsToTree(const TwoLevelTreeItems &data);
 
 signals:
     void stateChanged();
@@ -39,17 +49,15 @@ private slots:
     void on_cbAirportsLightingConst_toggled(bool checked);
     void on_cbAirportsLightingOnRequest_toggled(bool checked);
     void on_cbAirportsLightingNo_toggled(bool checked);
-    void on_cbAirportsOnlyFor_toggled(bool checked);
-    void on_comboAirportsRegion_currentTextChanged(const QString &arg);
     void on_cbAirportsFinancing_toggled(bool checked);
     void on_cbAirportsTraffic_toggled(bool checked);
     void on_gbHeliports_toggled(bool checked);
-    void on_cbHeliportsOnlyFor_toggled(bool checked);
-    void on_comboHeliportsRegion_currentTextChanged(const QString &arg);
     void on_btnAirportsColor_clicked();
     void on_btnAirportsFinancingColor_clicked();
     void on_btnAirportsTrafficColor_clicked();
     void on_btnHeliportsColor_clicked();
+    void on_cbAirportsOnlyFor_toggled(bool checked);
+
 
 private:
     Ui::ControlPanel *ui;

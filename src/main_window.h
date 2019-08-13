@@ -8,6 +8,7 @@
 #include "src/control_panel.h"
 #include "src/font_manager.h"
 #include "src/gui_config.h"
+#include "src/sql_query_model.h"
 
 
 class MainWindow : public QMainWindow
@@ -33,6 +34,7 @@ private:
 private:
     QQuickWidget *m_mapScene;
     ControlPanel *m_controlPanel;
+    QSqlDatabase  m_database;
 };
 
 #endif // MAIN_WINDOW_H

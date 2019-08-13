@@ -1,6 +1,8 @@
 #include "control_panel.h"
 #include "ui_control_panel.h"
 
+#include "custom_check_box.h"
+
 
 ControlPanel::ControlPanel(QWidget *parent)
     : QGroupBox(parent)
@@ -22,6 +24,26 @@ ControlPanel::~ControlPanel()
 const StateOfParameters& ControlPanel::state() const
 {
     return m_state;
+}
+
+void ControlPanel::setRegionsToTree(const TwoLevelTreeItems &data)
+{
+    for (int i = 0; i < data.topLevels.count(); i++) {
+        QTreeWidgetItem *top = new QTreeWidgetItem({data.topLevels[i]});
+        QList<QTreeWidgetItem*> children;
+        for (int j = 0; j < data.childrens[i].count(); j++) {
+            children.append(new QTreeWidgetItem({data.childrens[i][j]}));
+        }
+        top->addChildren(children);
+        ui->treeRegions->addTopLevelItem(top);
+    }
+
+    for (int i = 0; i < ui->treeRegions->topLevelItemCount(); ++i) {
+        treeWidgetItemAssignCheckBox(ui->treeRegions, ui->treeRegions->topLevelItem(i));
+        for (int j = 0; j < ui->treeRegions->topLevelItem(i)->childCount(); ++j) {
+            treeWidgetItemAssignCheckBox(ui->treeRegions, ui->treeRegions->topLevelItem(i)->child(j));
+        }
+    }
 }
 
 void ControlPanel::on_gbAirports_toggled(bool checked)
@@ -159,28 +181,6 @@ void ControlPanel::on_cbAirportsLightingNo_toggled(bool checked)
     emit stateChanged();
 }
 
-void ControlPanel::on_cbAirportsOnlyFor_toggled(bool checked)
-{
-    if (m_state.showAirportsOnlyForRegion == checked) {
-        return;
-    }
-    m_state.showAirportsOnlyForRegion = checked;
-    ui->comboAirportsRegion->setEnabled(checked);
-    if (checked) {
-        m_state.airportsRegion = ui->comboAirportsRegion->currentText();
-    }
-    emit stateChanged();
-}
-
-void ControlPanel::on_comboAirportsRegion_currentTextChanged(const QString &arg)
-{
-    if (m_state.airportsRegion == arg) {
-        return;
-    }
-    m_state.airportsRegion = arg;
-    emit stateChanged();
-}
-
 void ControlPanel::on_cbAirportsFinancing_toggled(bool checked)
 {
     if (m_state.showAirportsFinancing == checked) {
@@ -205,28 +205,6 @@ void ControlPanel::on_gbHeliports_toggled(bool checked)
         return;
     }
     m_state.showHeliports = checked;
-    emit stateChanged();
-}
-
-void ControlPanel::on_cbHeliportsOnlyFor_toggled(bool checked)
-{
-    if (m_state.showHeliportsOnlyForRegion == checked) {
-        return;
-    }
-    m_state.showHeliportsOnlyForRegion = checked;
-    ui->comboHeliportsRegion->setEnabled(checked);
-    if (checked) {
-        m_state.heliportsRegion = ui->comboHeliportsRegion->currentText();
-    }
-    emit stateChanged();
-}
-
-void ControlPanel::on_comboHeliportsRegion_currentTextChanged(const QString &arg)
-{
-    if (m_state.heliportsRegion == arg) {
-        return;
-    }
-    m_state.heliportsRegion = arg;
     emit stateChanged();
 }
 
@@ -263,5 +241,11 @@ void ControlPanel::on_btnHeliportsColor_clicked()
         return;
     }
     m_state.heliportsColor = ui->btnHeliportsColor->color();
+    emit stateChanged();
+}
+
+void ControlPanel::on_cbAirportsOnlyFor_toggled(bool checked)
+{
+    //...
     emit stateChanged();
 }

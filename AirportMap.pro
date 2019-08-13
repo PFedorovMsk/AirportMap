@@ -17,6 +17,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 SOURCES += \
     src/color_select_button.cpp \
     src/control_panel.cpp \
+    src/custom_check_box.cpp \
     src/font_manager.cc \
     src/main.cpp \
     src/main_window.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
 HEADERS += \
     src/color_select_button.h \
     src/control_panel.h \
+    src/custom_check_box.h \
     src/font_manager.h \
     src/gui_config.h \
     src/main_window.h \
