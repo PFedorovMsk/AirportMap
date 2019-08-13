@@ -1,4 +1,4 @@
-QT             += core gui location quickwidgets
+QT             += core gui location quickwidgets sql
 CONFIG         += c++11
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -20,6 +20,7 @@ SOURCES += \
     src/font_manager.cc \
     src/main.cpp \
     src/main_window.cpp \
+    src/sql_query_model.cpp \
     src/state_of_parameters.cpp
 
 HEADERS += \
@@ -28,6 +29,7 @@ HEADERS += \
     src/font_manager.h \
     src/gui_config.h \
     src/main_window.h \
+    src/sql_query_model.h \
     src/state_of_parameters.h
 
 RESOURCES += \
