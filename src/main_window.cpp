@@ -111,7 +111,7 @@ void MainWindow::test()
     c2.setAlpha(255);
 
     QString airportsQuery = "";
-    if (state.showAirports) {
+    if (state.airports) {
         airportsQuery = "SELECT TAir.air_inter_code, TAir.name_ru, TAir.air_latitude, TAir.air_longitude \
                          FROM tab_airports AS TAir WHERE TAir.id_air_type = 1";
     }

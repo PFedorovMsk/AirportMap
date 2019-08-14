@@ -6,33 +6,34 @@
 
 
 struct StateOfParameters {
-    bool    showAirports;
-    bool    showAirportsInternational;
-    bool    showAirportsDomestic;
-    bool    showAirportsWithHardCoverOfRunway;
-    bool    showAirportsWithGroundCoverOfRunway;
-    bool    showAirportsWithRunwayType1;
-    bool    showAirportsWithRunwayType2;
-    bool    showAirportsWithRunwayType3;
-    bool    showAirportsWithRunwayType4;
-    bool    showAirportsWithRunwayType5;
-    bool    showAirportsWithRunwayType6;
-    bool    showAirportsWithRunwayTypeNo;
-    bool    showAirportsWithConstantLighting;
-    bool    showAirportsWithLightingByRequest;
-    bool    showAirportsWithoutLighting;
-    bool    showAirportsOnlyForRegion;
-    QString airportsRegion;
-    QColor  airportsColor;
-    bool    showAirportsFinancing;
-    QColor  airportsFinancingColor;
-    bool    showAirportsTraffic;
-    QColor  airportsTrafficColor;
+    bool airports;
+    bool heliports;
+    bool cities;
+    bool financing;
+    bool traffic;
+    bool international;
+    bool domestic;
+    bool runwayCoverHard;
+    bool runwayCoverGround;
+    bool runwayType1;
+    bool runwayType2;
+    bool runwayType3;
+    bool runwayType4;
+    bool runwayType5;
+    bool runwayType6;
+    bool runwayNo;
+    bool lightingConst;
+    bool lightingOnRequest;
+    bool lightingNo;
+    bool onlyFor;
 
-    bool    showHeliports;
-    bool    showHeliportsOnlyForRegion;
-    QString heliportsRegion;
-    QColor  heliportsColor;
+    QColor airportsColor;
+    QColor heliportsColor;
+    QColor citiesColor;
+    QColor financingColor;
+    QColor trafficColor;
+
+    QStringList regionList;
 
     StateOfParameters();
 };

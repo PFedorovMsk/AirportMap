@@ -1,11 +1,13 @@
 #ifndef CONTROL_PANEL_H
 #define CONTROL_PANEL_H
 
-#include <QGroupBox>
 #include "state_of_parameters.h"
+#include <QGroupBox>
 
-#include <QSqlQueryModel>
 #include <QSqlDatabase>
+#include <QSqlQueryModel>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 
 
 namespace Ui
@@ -14,7 +16,7 @@ class ControlPanel;
 }
 
 struct TwoLevelTreeItems {
-    QVector<QString> topLevels;
+    QVector<QString>          topLevels;
     QVector<QVector<QString>> childrens;
 };
 
@@ -26,37 +28,41 @@ public:
     explicit ControlPanel(QWidget *parent = nullptr);
     ~ControlPanel();
 
-    const StateOfParameters& state() const;
+    const StateOfParameters &state() const;
 
     void setRegionsToTree(const TwoLevelTreeItems &data);
+
+    void process(QTreeWidget *tree_widget, QTreeWidgetItem *tree_item);
 
 signals:
     void stateChanged();
 
 private slots:
-    void on_gbAirports_toggled(bool checked);
-    void on_cbAirportsInternational_toggled(bool checked);
-    void on_cbAirportsDomestic_toggled(bool checked);
-    void on_cbAirportsRunwayCoverHard_toggled(bool checked);
-    void on_cbAirportsRunwayCoverGround_toggled(bool checked);
-    void on_cbAirportsRunwayType1_toggled(bool checked);
-    void on_cbAirportsRunwayType2_toggled(bool checked);
-    void on_cbAirportsRunwayType3_toggled(bool checked);
-    void on_cbAirportsRunwayType4_toggled(bool checked);
-    void on_cbAirportsRunwayType5_toggled(bool checked);
-    void on_cbAirportsRunwayType6_toggled(bool checked);
-    void on_cbAirportsRunwayNo_toggled(bool checked);
-    void on_cbAirportsLightingConst_toggled(bool checked);
-    void on_cbAirportsLightingOnRequest_toggled(bool checked);
-    void on_cbAirportsLightingNo_toggled(bool checked);
-    void on_cbAirportsFinancing_toggled(bool checked);
-    void on_cbAirportsTraffic_toggled(bool checked);
-    void on_gbHeliports_toggled(bool checked);
+    void on_cbAirports_toggled(bool checked);
+    void on_cbHeliports_toggled(bool checked);
+    void on_cbCities_toggled(bool checked);
+    void on_cbFinancing_toggled(bool checked);
+    void on_cbTraffic_toggled(bool checked);
     void on_btnAirportsColor_clicked();
-    void on_btnAirportsFinancingColor_clicked();
-    void on_btnAirportsTrafficColor_clicked();
     void on_btnHeliportsColor_clicked();
-    void on_cbAirportsOnlyFor_toggled(bool checked);
+    void on_btnCitiesColor_clicked();
+    void on_btnFinancingColor_clicked();
+    void on_btnTrafficColor_clicked();
+    void on_cbInternational_toggled(bool checked);
+    void on_cbDomestic_toggled(bool checked);
+    void on_cbRunwayCoverHard_toggled(bool checked);
+    void on_cbRunwayCoverGround_toggled(bool checked);
+    void on_cbRunwayType1_toggled(bool checked);
+    void on_cbRunwayType2_toggled(bool checked);
+    void on_cbRunwayType3_toggled(bool checked);
+    void on_cbRunwayType4_toggled(bool checked);
+    void on_cbRunwayType5_toggled(bool checked);
+    void on_cbRunwayType6_toggled(bool checked);
+    void on_cbRunwayNo_toggled(bool checked);
+    void on_cbLightingConst_toggled(bool checked);
+    void on_cbLightingOnRequest_toggled(bool checked);
+    void on_cbLightingNo_toggled(bool checked);
+    void on_cbOnlyFor_toggled(bool checked);
 
 
 private:
