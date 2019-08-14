@@ -298,5 +298,5 @@ void ControlPanel::process(QTreeWidget *tree_widget, QTreeWidgetItem *tree_item)
     CustomCheckBox *checkbox = static_cast<CustomCheckBox *>(ui->treeRegions->itemWidget(tree_item, 0));
     m_state.regionList.append((checkbox->text()));
 
-    (void) tree_widget;
+    (void)tree_widget;
 }

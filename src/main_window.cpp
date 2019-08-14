@@ -29,8 +29,9 @@ MainWindow::MainWindow(QWidget *parent)
     setGeometry(screenRect.x() + dx, screenRect.y() + dy, screenRect.width() - 2 * dx, screenRect.height() - 2 * dy);
     this->showMaximized();
 
-    connect(m_controlPanel, SIGNAL(stateChanged()), this, SLOT(test()));
-    // для теста, потом удалить:
+    connect(m_controlPanel, SIGNAL(stateChanged()), this, SLOT(paintAirportsAndHeliports()));
+    //connect(m_controlPanel, SIGNAL(stateChanged()), this, SLOT(paintCities()));
+
     emit m_controlPanel->stateChanged();
 }
 
@@ -100,26 +101,161 @@ void MainWindow::initLayouts()
 
 // slots:
 
-void MainWindow::onClear() {}
-
-
-void MainWindow::test()
+void MainWindow::paintAirportsAndHeliports()
 {
-    StateOfParameters state = m_controlPanel->state();
-    QColor            c1    = state.airportsColor;
-    QColor            c2    = c1;
-    c2.setAlpha(255);
+    m_mapScene->rootContext()->setContextProperty("airport_model", nullptr);
+    m_mapScene->rootContext()->setContextProperty("heliport_model", nullptr);
 
-    QString airportsQuery = "";
-    if (state.airports) {
-        airportsQuery = "SELECT TAir.air_inter_code, TAir.name_ru, TAir.air_latitude, TAir.air_longitude \
-                         FROM tab_airports AS TAir WHERE TAir.id_air_type = 1";
+    StateOfParameters state = m_controlPanel->state();
+    if ((!state.airports && !state.heliports) || (!state.international && !state.domestic) ||
+        (!state.runwayCoverHard && !state.runwayCoverGround) ||
+        (!state.runwayType1 && !state.runwayType2 && !state.runwayType3 && !state.runwayType4 && !state.runwayType5 &&
+         !state.runwayType6 && !state.runwayNo)) {
+        return;
     }
+
+    bool needTabAreas  = state.onlyFor;
+    bool needTabStrips = (!(state.runwayCoverHard && state.runwayCoverGround) ||
+                          !(state.runwayType1 && state.runwayType2 && state.runwayType3 && state.runwayType4 &&
+                            state.runwayType5 && state.runwayType6 && state.runwayNo));
+
+    QString query = "";
+    query += "SELECT TAir.name_ru, TAir.air_latitude, TAir.air_longitude FROM tab_airports AS TAir ";
+    if (needTabAreas) {
+        query += "INNER JOIN tab_areas AS TArea ON TAir.id_oktmo_area = TArea.id_oktmo_area ";
+    }
+    if (needTabStrips) {
+        query += "INNER JOIN tab_strips AS TStrips ON TAir.id_air = TStrips.id_air ";
+    }
+    query += "WHERE ";
+
+    if (state.onlyFor == true) {
+        query += "(";
+        for (int i = 0; i < state.regionList.count(); i++) {
+            query += "TArea.name_area = '" + state.regionList.at(i) + "' ";
+            if (i < state.regionList.count() - 1) {
+                query += "OR ";
+            }
+        }
+        query += ") AND";
+    }
+
+    if (state.international && !state.domestic) {
+        query += " TAir.id_air_class = 1 AND";
+    } else if (!state.international && state.domestic) {
+        query += " TAir.id_air_class = 2 AND";
+    }
+
+    if (state.runwayCoverHard && !state.runwayCoverGround) {
+        query += " TStrips.id_str_type = 1 AND";
+    } else if (!state.runwayCoverHard && state.runwayCoverGround) {
+        query += " TStrips.id_str_type = 2 AND";
+    }
+
+    if (needTabStrips) {
+        QString subQuery = "";
+        if (state.runwayType1) {
+            subQuery += "TStrips.id_str_class = 1";
+        }
+        if (state.runwayType2) {
+            if (subQuery.length() > 0) {
+                subQuery += " OR ";
+            }
+            subQuery += "TStrips.id_str_class = 2";
+        }
+        if (state.runwayType3) {
+            if (subQuery.length() > 0) {
+                subQuery += " OR ";
+            }
+            subQuery += "TStrips.id_str_class = 3";
+        }
+        if (state.runwayType4) {
+            if (subQuery.length() > 0) {
+                subQuery += " OR ";
+            }
+            subQuery += "TStrips.id_str_class = 4";
+        }
+        if (state.runwayType5) {
+            if (subQuery.length() > 0) {
+                subQuery += " OR ";
+            }
+            subQuery += "TStrips.id_str_class = 5";
+        }
+        if (state.runwayType6) {
+            if (subQuery.length() > 0) {
+                subQuery += " OR ";
+            }
+            subQuery += "TStrips.id_str_class = 6";
+        }
+        if (state.runwayNo) {
+            if (subQuery.length() > 0) {
+                subQuery += " OR ";
+            }
+            subQuery += "TStrips.id_str_class = 7";
+        }
+        query += " (" + subQuery + ") AND";
+    }
+
+    if (state.airports) {
+        QColor color       = state.airportsColor;
+        QColor borderColor = color;
+        borderColor.setAlpha(255);
+
+        SqlQueryModel model;
+        model.setRadius(4);
+        model.setColor(color);
+        model.setBorderColor(borderColor);
+        model.setQuery(query + " TAir.id_air_type = 1", m_database);
+        m_mapScene->rootContext()->setContextProperty("airport_model", &model);
+    }
+
+    if (state.heliports) {
+        QColor color       = state.heliportsColor;
+        QColor borderColor = color;
+        borderColor.setAlpha(255);
+
+        SqlQueryModel model;
+        model.setRadius(4);
+        model.setColor(color);
+        model.setBorderColor(borderColor);
+        model.setQuery(query + " TAir.id_air_type = 2", m_database);
+        m_mapScene->rootContext()->setContextProperty("heliport_model", &model);
+    }
+}
+
+void MainWindow::paintCities()
+{
+    qDebug() << "paintCIties start";
+    m_mapScene->rootContext()->setContextProperty("cities_model", nullptr);
+
+    StateOfParameters state = m_controlPanel->state();
+    qDebug() << "state: " << state.cities;
+    if (!(state.cities && state.onlyFor)) {
+        qDebug() << "exit";
+        return;
+    }
+
+    QString query = "";
+    query += "SELECT TLC.name_city, TLC.latitude_city, TLC.longitude_city FROM tab_local_cities AS TLC ";
+    query += "INNER JOIN tab_areas AS TArea ON TLC.id_oktmo_area = TArea.id_oktmo_area WHERE (";
+    for (int i = 0; i < state.regionList.count(); i++) {
+        query += "TArea.name_area = '" + state.regionList.at(i) + "' ";
+        if (i < state.regionList.count() - 1) {
+            query += "OR ";
+        }
+    }
+    query += ")";
+
+    qDebug() << "query = " << query;
+    QColor color       = state.citiesColor;
+    QColor borderColor = color;
+    borderColor.setAlpha(255);
 
     SqlQueryModel model;
     model.setRadius(5);
-    model.setColor(c1);
-    model.setBorderColor(c2);
-    model.setQuery(airportsQuery, m_database);
-    m_mapScene->rootContext()->setContextProperty("airport_model", &model);
+    model.setColor(color);
+    model.setBorderColor(borderColor);
+    model.setQuery(query, m_database);
+    m_mapScene->rootContext()->setContextProperty("cities_model", &model);
+    qDebug() << "good finish";
 }

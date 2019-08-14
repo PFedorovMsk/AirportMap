@@ -1,12 +1,12 @@
-import QtQuick 2.9
-import QtQuick.Window 2.9
-import QtLocation 5.9
-import QtPositioning 5.9
+import QtQuick 2.12
+import QtQuick.Window 2.12
+import QtLocation 5.12
+import QtPositioning 5.12
 
 
 Rectangle {
-    width: 512
-    height: 512
+    width: 1200
+    height: 800
     visible: true
 
     property variant topLeftRussia:     QtPositioning.coordinate(78.0, 19.0)
@@ -16,10 +16,10 @@ Rectangle {
     Plugin {
         id: mapPlugin
         name: "osm"
-//        PluginParameter {
-//            name: "osm.mapping.host"
-//            value: "http://a.tile.openstreetmap.org/"
-//        }
+        PluginParameter {
+            name: "osm.mapping.host"
+            value: "http://a.tile.openstreetmap.org/"
+        }
     }
 
     Map {
@@ -27,7 +27,7 @@ Rectangle {
         anchors.fill: parent
         plugin: mapPlugin
         visibleRegion: viewOfRussia
-        maximumZoomLevel: 11
+        maximumZoomLevel: 12
 
         MapItemView {
             id: airportsView
@@ -35,11 +35,11 @@ Rectangle {
 
             delegate: MapQuickItem {
                 coordinate: QtPositioning.coordinate(model.air_latitude, model.air_longitude)
-                anchorPoint.x: rect.width/2
-                anchorPoint.y: rect.height
+                anchorPoint.x: rectA.width/2
+                anchorPoint.y: rectA.height
 
                 sourceItem: Rectangle {
-                    id: rect
+                    id: rectA
                     color: model.color
                     radius: model.radius
                     width: radius * 2
@@ -53,7 +53,7 @@ Rectangle {
                     anchors.fill: parent
                     hoverEnabled: true
                     Text {
-                        id: tmpText
+                        id: tmpTextA
                         visible: false
                         text: model.name_ru
                         anchors.bottom: parent.top
@@ -62,10 +62,94 @@ Rectangle {
                         antialiasing: true
                     }
                     onEntered: {
-                        tmpText.visible = true
+                        tmpTextA.visible = true
                     }
                     onExited: {
-                        tmpText.visible = false
+                        tmpTextA.visible = false
+                    }
+                }
+            }
+        }
+
+        MapItemView {
+            id: heliportsView
+            model: heliport_model
+
+            delegate: MapQuickItem {
+                coordinate: QtPositioning.coordinate(model.air_latitude, model.air_longitude)
+                anchorPoint.x: rectH.width/2
+                anchorPoint.y: rectH.height
+
+                sourceItem: Rectangle {
+                    id: rectH
+                    color: model.color
+                    radius: model.radius
+                    width: radius * 2
+                    height: radius * 2
+                    border.width: 1
+                    border.color: model.borderColor
+                    smooth: true
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    Text {
+                        id: tmpTextH
+                        visible: false
+                        text: model.name_ru
+                        anchors.bottom: parent.top
+                        color: "black"
+                        font.pointSize: 11
+                        antialiasing: true
+                    }
+                    onEntered: {
+                        tmpTextH.visible = true
+                    }
+                    onExited: {
+                        tmpTextH.visible = false
+                    }
+                }
+            }
+        }
+
+        MapItemView {
+            id: citiesView
+            model: cities_model
+
+            delegate: MapQuickItem {
+                coordinate: QtPositioning.coordinate(model.latitude_city, model.longitude_city)
+                anchorPoint.x: rectC.width/2
+                anchorPoint.y: rectC.height
+
+                sourceItem: Rectangle {
+                    id: rectC
+                    color: model.color
+                    radius: model.radius
+                    width: radius * 2
+                    height: radius * 2
+                    border.width: 1
+                    border.color: model.borderColor
+                    smooth: true
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    Text {
+                        id: tmpTextC
+                        visible: false
+                        text: model.name_city
+                        anchors.bottom: parent.top
+                        color: "black"
+                        font.pointSize: 11
+                        antialiasing: true
+                    }
+                    onEntered: {
+                        tmpTextC.visible = true
+                    }
+                    onExited: {
+                        tmpTextC.visible = false
                     }
                 }
             }

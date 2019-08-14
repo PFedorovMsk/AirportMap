@@ -3,7 +3,7 @@
 
 StateOfParameters::StateOfParameters()
     : airports(true)
-    , heliports(false)
+    , heliports(true)
     , cities(false)
     , financing(false)
     , traffic(false)

@@ -23,8 +23,8 @@ signals:
     void clear();
 
 private slots:
-    void onClear();
-    void test();
+    void paintAirportsAndHeliports();
+    void paintCities();
 
 private:
     void loadFonts();
