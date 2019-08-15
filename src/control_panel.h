@@ -35,19 +35,18 @@ public:
     void process(QTreeWidget *tree_widget, QTreeWidgetItem *tree_item);
 
 signals:
-    void stateChanged();
+    void mainStateChanged();
+    void additionalStateChanged();
 
 private slots:
     void on_cbAirports_toggled(bool checked);
     void on_cbHeliports_toggled(bool checked);
     void on_cbCities_toggled(bool checked);
     void on_cbFinancing_toggled(bool checked);
-    void on_cbTraffic_toggled(bool checked);
     void on_btnAirportsColor_clicked();
     void on_btnHeliportsColor_clicked();
     void on_btnCitiesColor_clicked();
     void on_btnFinancingColor_clicked();
-    void on_btnTrafficColor_clicked();
     void on_cbInternational_toggled(bool checked);
     void on_cbDomestic_toggled(bool checked);
     void on_cbRunwayCoverHard_toggled(bool checked);
@@ -59,11 +58,10 @@ private slots:
     void on_cbRunwayType5_toggled(bool checked);
     void on_cbRunwayType6_toggled(bool checked);
     void on_cbRunwayNo_toggled(bool checked);
-    void on_cbLightingConst_toggled(bool checked);
-    void on_cbLightingOnRequest_toggled(bool checked);
-    void on_cbLightingNo_toggled(bool checked);
+    void on_cbBudget_toggled(bool checked);
+    void on_cbExtraBudget_toggled(bool checked);
     void on_cbOnlyFor_toggled(bool checked);
-
+    void on_btnUpdate_clicked();
 
 private:
     Ui::ControlPanel *ui;

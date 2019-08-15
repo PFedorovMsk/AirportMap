@@ -29,10 +29,15 @@ MainWindow::MainWindow(QWidget *parent)
     setGeometry(screenRect.x() + dx, screenRect.y() + dy, screenRect.width() - 2 * dx, screenRect.height() - 2 * dy);
     this->showMaximized();
 
-    connect(m_controlPanel, SIGNAL(stateChanged()), this, SLOT(paintAirportsAndHeliports()));
-    //connect(m_controlPanel, SIGNAL(stateChanged()), this, SLOT(paintCities()));
+    m_mapScene->rootContext()->setContextProperty("cities_model", nullptr);
+    m_mapScene->rootContext()->setContextProperty("financing_model", nullptr);
+    m_mapScene->rootContext()->setContextProperty("airport_model", nullptr);
+    m_mapScene->rootContext()->setContextProperty("heliport_model", nullptr);
 
-    emit m_controlPanel->stateChanged();
+    connect(m_controlPanel, SIGNAL(mainStateChanged()), this, SLOT(paintMainObjects()));
+    connect(m_controlPanel, SIGNAL(additionalStateChanged()), this, SLOT(paintAdditionalObjects()));
+
+    emit paintMainObjects();
 }
 
 MainWindow::~MainWindow()
@@ -101,55 +106,153 @@ void MainWindow::initLayouts()
 
 // slots:
 
-void MainWindow::paintAirportsAndHeliports()
+inline QColor colorWithoutAlpha(const QColor &color)
 {
+    QColor res = color;
+    res.setAlpha(255);
+    return res;
+}
+
+void MainWindow::paintMainObjects()
+{
+    m_mapScene->rootContext()->setContextProperty("financing_model", nullptr);
     m_mapScene->rootContext()->setContextProperty("airport_model", nullptr);
     m_mapScene->rootContext()->setContextProperty("heliport_model", nullptr);
 
     StateOfParameters state = m_controlPanel->state();
-    if ((!state.airports && !state.heliports) || (!state.international && !state.domestic) ||
-        (!state.runwayCoverHard && !state.runwayCoverGround) ||
-        (!state.runwayType1 && !state.runwayType2 && !state.runwayType3 && !state.runwayType4 && !state.runwayType5 &&
-         !state.runwayType6 && !state.runwayNo)) {
+
+    QString financingQuery = "";
+    QString airportsQuery  = "";
+    QString heliportsQuery = "";
+
+    makeFinancingQuery(state, financingQuery);
+    makeAirpotsAndHeliportsQuery(state, airportsQuery, heliportsQuery);
+
+    if (financingQuery.length() > 0) {
+        QColor        color       = state.financingColor;
+        QColor        borderColor = colorWithoutAlpha(color);
+        SqlQueryModel model;
+        model.setRadius(50);
+        model.setColor(color);
+        model.setBorderColor(borderColor);
+        model.setQuery(financingQuery, m_database);
+        m_mapScene->rootContext()->setContextProperty("financing_model", &model);
+    }
+
+    if (airportsQuery.length() > 0) {
+        QColor        color       = state.airportsColor;
+        QColor        borderColor = colorWithoutAlpha(color);
+        SqlQueryModel model;
+        model.setRadius(5);
+        model.setColor(color);
+        model.setBorderColor(borderColor);
+        model.setQuery(airportsQuery, m_database);
+        m_mapScene->rootContext()->setContextProperty("airport_model", &model);
+    }
+
+    if (heliportsQuery.length() > 0) {
+        QColor        color       = state.heliportsColor;
+        QColor        borderColor = colorWithoutAlpha(color);
+        SqlQueryModel model;
+        model.setRadius(5);
+        model.setColor(color);
+        model.setBorderColor(borderColor);
+        model.setQuery(heliportsQuery, m_database);
+        m_mapScene->rootContext()->setContextProperty("heliport_model", &model);
+    }
+}
+
+void MainWindow::paintAdditionalObjects()
+{
+    m_mapScene->rootContext()->setContextProperty("cities_model", nullptr);
+
+    QString           citiesQuery = "";
+    StateOfParameters state       = m_controlPanel->state();
+
+    makeCitiesQuery(state, citiesQuery);
+
+    if (citiesQuery.length() > 0) {
+        QColor        color       = state.citiesColor;
+        QColor        borderColor = colorWithoutAlpha(color);
+        SqlQueryModel model;
+        model.setRadius(4);
+        model.setColor(color);
+        model.setBorderColor(borderColor);
+        model.setQuery(citiesQuery, m_database);
+        m_mapScene->rootContext()->setContextProperty("cities_model", &model);
+    }
+}
+
+void MainWindow::makeCitiesQuery(const StateOfParameters &state, QString &citiesQuery)
+{
+    citiesQuery = "";
+
+    if (!state.cities) {
         return;
     }
 
-    bool needTabAreas  = state.onlyFor;
+    citiesQuery += "SELECT TLC.name_city, TLC.latitude_city, TLC.longitude_city ";
+    citiesQuery += "FROM tab_local_cities AS TLC ";
+
+    if (state.onlyFor && state.regionList.count() > 0) {
+        citiesQuery += "INNER JOIN tab_municipal_areas AS TMA ON TLC.id_oktmo_municip = TMA.id_oktmo_municip ";
+        citiesQuery += "INNER JOIN tab_areas AS TA ON TMA.id_oktmo_area = TA.id_oktmo_area ";
+        citiesQuery += "INNER JOIN tab_federal_areas AS TFA ON TA.id_fed_area = TFA.id_fed_area WHERE (";
+        for (int i = 0; i < state.regionList.count(); i++) {
+            citiesQuery += "TA.name_area = '" + state.regionList.at(i) + "' ";
+            if (i < state.regionList.count() - 1) {
+                citiesQuery += "OR ";
+            }
+        }
+        citiesQuery += ")";
+    }
+}
+
+void MainWindow::makeFinancingQuery(const StateOfParameters &state, QString &financingQuery)
+{
+    financingQuery = "";
+
+    if (!state.financing) {
+        return;
+    }
+
+    financingQuery += "SELECT TA.name_ru, TA.air_latitude, TA.air_longitude, TE.budget_mil_rub::numeric, ";
+    financingQuery += "TE.extrabudget_mil_rub::numeric, SUM(budget_mil_rub + extrabudget_mil_rub)::numeric AS summa ";
+    financingQuery += "FROM tab_airports AS TA INNER JOIN tab_economic as TE ON TA.id_air = TE.id_air ";
+    financingQuery +=
+        "GROUP BY TA.name_ru, TA.air_latitude, TA.air_longitude, TE.budget_mil_rub, TE.extrabudget_mil_rub ";
+}
+
+void MainWindow::makeAirpotsAndHeliportsQuery(const StateOfParameters &state, QString &airportsQuery,
+                                              QString &heliportsQuery)
+{
+    airportsQuery  = "";
+    heliportsQuery = "";
+
+    if (!state.airports && !state.heliports) {
+        return;
+    }
+
     bool needTabStrips = (!(state.runwayCoverHard && state.runwayCoverGround) ||
                           !(state.runwayType1 && state.runwayType2 && state.runwayType3 && state.runwayType4 &&
                             state.runwayType5 && state.runwayType6 && state.runwayNo));
 
-    QString query = "";
-    query += "SELECT TAir.name_ru, TAir.air_latitude, TAir.air_longitude FROM tab_airports AS TAir ";
-    if (needTabAreas) {
-        query += "INNER JOIN tab_areas AS TArea ON TAir.id_oktmo_area = TArea.id_oktmo_area ";
-    }
+    QString query = "SELECT TAir.name_ru, TAir.air_latitude, TAir.air_longitude FROM tab_airports AS TAir ";
     if (needTabStrips) {
         query += "INNER JOIN tab_strips AS TStrips ON TAir.id_air = TStrips.id_air ";
     }
     query += "WHERE ";
 
-    if (state.onlyFor == true) {
-        query += "(";
-        for (int i = 0; i < state.regionList.count(); i++) {
-            query += "TArea.name_area = '" + state.regionList.at(i) + "' ";
-            if (i < state.regionList.count() - 1) {
-                query += "OR ";
-            }
-        }
-        query += ") AND";
-    }
-
     if (state.international && !state.domestic) {
-        query += " TAir.id_air_class = 1 AND";
+        query += " TAir.id_air_class = 1 AND ";
     } else if (!state.international && state.domestic) {
-        query += " TAir.id_air_class = 2 AND";
+        query += " TAir.id_air_class = 2 AND ";
     }
 
     if (state.runwayCoverHard && !state.runwayCoverGround) {
-        query += " TStrips.id_str_type = 1 AND";
+        query += " TStrips.id_str_type = 1 AND ";
     } else if (!state.runwayCoverHard && state.runwayCoverGround) {
-        query += " TStrips.id_str_type = 2 AND";
+        query += " TStrips.id_str_type = 2 AND ";
     }
 
     if (needTabStrips) {
@@ -193,69 +296,13 @@ void MainWindow::paintAirportsAndHeliports()
             }
             subQuery += "TStrips.id_str_class = 7";
         }
-        query += " (" + subQuery + ") AND";
+        query += " (" + subQuery + ") AND ";
     }
 
     if (state.airports) {
-        QColor color       = state.airportsColor;
-        QColor borderColor = color;
-        borderColor.setAlpha(255);
-
-        SqlQueryModel model;
-        model.setRadius(4);
-        model.setColor(color);
-        model.setBorderColor(borderColor);
-        model.setQuery(query + " TAir.id_air_type = 1", m_database);
-        m_mapScene->rootContext()->setContextProperty("airport_model", &model);
+        airportsQuery = query + "TAir.id_air_type = 1";
     }
-
     if (state.heliports) {
-        QColor color       = state.heliportsColor;
-        QColor borderColor = color;
-        borderColor.setAlpha(255);
-
-        SqlQueryModel model;
-        model.setRadius(4);
-        model.setColor(color);
-        model.setBorderColor(borderColor);
-        model.setQuery(query + " TAir.id_air_type = 2", m_database);
-        m_mapScene->rootContext()->setContextProperty("heliport_model", &model);
+        heliportsQuery = query + "TAir.id_air_type = 2";
     }
-}
-
-void MainWindow::paintCities()
-{
-    qDebug() << "paintCIties start";
-    m_mapScene->rootContext()->setContextProperty("cities_model", nullptr);
-
-    StateOfParameters state = m_controlPanel->state();
-    qDebug() << "state: " << state.cities;
-    if (!(state.cities && state.onlyFor)) {
-        qDebug() << "exit";
-        return;
-    }
-
-    QString query = "";
-    query += "SELECT TLC.name_city, TLC.latitude_city, TLC.longitude_city FROM tab_local_cities AS TLC ";
-    query += "INNER JOIN tab_areas AS TArea ON TLC.id_oktmo_area = TArea.id_oktmo_area WHERE (";
-    for (int i = 0; i < state.regionList.count(); i++) {
-        query += "TArea.name_area = '" + state.regionList.at(i) + "' ";
-        if (i < state.regionList.count() - 1) {
-            query += "OR ";
-        }
-    }
-    query += ")";
-
-    qDebug() << "query = " << query;
-    QColor color       = state.citiesColor;
-    QColor borderColor = color;
-    borderColor.setAlpha(255);
-
-    SqlQueryModel model;
-    model.setRadius(5);
-    model.setColor(color);
-    model.setBorderColor(borderColor);
-    model.setQuery(query, m_database);
-    m_mapScene->rootContext()->setContextProperty("cities_model", &model);
-    qDebug() << "good finish";
 }

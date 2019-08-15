@@ -10,7 +10,6 @@ struct StateOfParameters {
     bool heliports;
     bool cities;
     bool financing;
-    bool traffic;
     bool international;
     bool domestic;
     bool runwayCoverHard;
@@ -22,16 +21,14 @@ struct StateOfParameters {
     bool runwayType5;
     bool runwayType6;
     bool runwayNo;
-    bool lightingConst;
-    bool lightingOnRequest;
-    bool lightingNo;
+    bool budget;
+    bool extraBudget;
     bool onlyFor;
 
     QColor airportsColor;
     QColor heliportsColor;
     QColor citiesColor;
     QColor financingColor;
-    QColor trafficColor;
 
     QStringList regionList;
 

@@ -14,7 +14,6 @@ ControlPanel::ControlPanel(QWidget *parent)
     ui->btnHeliportsColor->setColor(m_state.heliportsColor);
     ui->btnCitiesColor->setColor(m_state.citiesColor);
     ui->btnFinancingColor->setColor(m_state.financingColor);
-    ui->btnTrafficColor->setColor(m_state.trafficColor);
 }
 
 ControlPanel::~ControlPanel()
@@ -53,7 +52,7 @@ void ControlPanel::on_cbAirports_toggled(bool checked)
         return;
     }
     m_state.airports = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbHeliports_toggled(bool checked)
@@ -62,7 +61,7 @@ void ControlPanel::on_cbHeliports_toggled(bool checked)
         return;
     }
     m_state.heliports = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbCities_toggled(bool checked)
@@ -71,7 +70,6 @@ void ControlPanel::on_cbCities_toggled(bool checked)
         return;
     }
     m_state.cities = checked;
-    emit stateChanged();
 }
 
 void ControlPanel::on_cbFinancing_toggled(bool checked)
@@ -80,16 +78,7 @@ void ControlPanel::on_cbFinancing_toggled(bool checked)
         return;
     }
     m_state.financing = checked;
-    emit stateChanged();
-}
-
-void ControlPanel::on_cbTraffic_toggled(bool checked)
-{
-    if (m_state.traffic == checked) {
-        return;
-    }
-    m_state.traffic = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_btnAirportsColor_clicked()
@@ -102,7 +91,7 @@ void ControlPanel::on_btnAirportsColor_clicked()
     if (ui->cbAirports->isChecked() == false) {
         return;
     }
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_btnHeliportsColor_clicked()
@@ -114,7 +103,7 @@ void ControlPanel::on_btnHeliportsColor_clicked()
     if (ui->cbHeliports->isChecked() == false) {
         return;
     }
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_btnCitiesColor_clicked()
@@ -126,7 +115,7 @@ void ControlPanel::on_btnCitiesColor_clicked()
     if (ui->cbCities->isChecked() == false) {
         return;
     }
-    emit stateChanged();
+    //emit mainStateChanged();
 }
 
 void ControlPanel::on_btnFinancingColor_clicked()
@@ -138,19 +127,7 @@ void ControlPanel::on_btnFinancingColor_clicked()
     if (ui->cbFinancing->isChecked() == false) {
         return;
     }
-    emit stateChanged();
-}
-
-void ControlPanel::on_btnTrafficColor_clicked()
-{
-    if (m_state.trafficColor == ui->btnTrafficColor->color()) {
-        return;
-    }
-    m_state.trafficColor = ui->btnTrafficColor->color();
-    if (ui->cbTraffic->isChecked() == false) {
-        return;
-    }
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbInternational_toggled(bool checked)
@@ -159,7 +136,7 @@ void ControlPanel::on_cbInternational_toggled(bool checked)
         return;
     }
     m_state.international = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbDomestic_toggled(bool checked)
@@ -168,7 +145,7 @@ void ControlPanel::on_cbDomestic_toggled(bool checked)
         return;
     }
     m_state.domestic = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayCoverHard_toggled(bool checked)
@@ -177,7 +154,7 @@ void ControlPanel::on_cbRunwayCoverHard_toggled(bool checked)
         return;
     }
     m_state.runwayCoverHard = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayCoverGround_toggled(bool checked)
@@ -186,7 +163,7 @@ void ControlPanel::on_cbRunwayCoverGround_toggled(bool checked)
         return;
     }
     m_state.runwayCoverGround = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayType1_toggled(bool checked)
@@ -195,7 +172,7 @@ void ControlPanel::on_cbRunwayType1_toggled(bool checked)
         return;
     }
     m_state.runwayType1 = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayType2_toggled(bool checked)
@@ -204,7 +181,7 @@ void ControlPanel::on_cbRunwayType2_toggled(bool checked)
         return;
     }
     m_state.runwayType2 = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayType3_toggled(bool checked)
@@ -213,7 +190,7 @@ void ControlPanel::on_cbRunwayType3_toggled(bool checked)
         return;
     }
     m_state.runwayType3 = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayType4_toggled(bool checked)
@@ -222,7 +199,7 @@ void ControlPanel::on_cbRunwayType4_toggled(bool checked)
         return;
     }
     m_state.runwayType4 = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayType5_toggled(bool checked)
@@ -231,7 +208,7 @@ void ControlPanel::on_cbRunwayType5_toggled(bool checked)
         return;
     }
     m_state.runwayType5 = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayType6_toggled(bool checked)
@@ -240,7 +217,7 @@ void ControlPanel::on_cbRunwayType6_toggled(bool checked)
         return;
     }
     m_state.runwayType6 = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbRunwayNo_toggled(bool checked)
@@ -249,34 +226,25 @@ void ControlPanel::on_cbRunwayNo_toggled(bool checked)
         return;
     }
     m_state.runwayNo = checked;
-    emit stateChanged();
+    emit mainStateChanged();
 }
 
-void ControlPanel::on_cbLightingConst_toggled(bool checked)
+void ControlPanel::on_cbBudget_toggled(bool checked)
 {
-    if (m_state.lightingConst == checked) {
+    if (m_state.budget == checked) {
         return;
     }
-    m_state.lightingConst = checked;
-    emit stateChanged();
+    m_state.budget = checked;
+    emit mainStateChanged();
 }
 
-void ControlPanel::on_cbLightingOnRequest_toggled(bool checked)
+void ControlPanel::on_cbExtraBudget_toggled(bool checked)
 {
-    if (m_state.lightingOnRequest == checked) {
+    if (m_state.extraBudget == checked) {
         return;
     }
-    m_state.lightingOnRequest = checked;
-    emit stateChanged();
-}
-
-void ControlPanel::on_cbLightingNo_toggled(bool checked)
-{
-    if (m_state.lightingNo == checked) {
-        return;
-    }
-    m_state.lightingNo = checked;
-    emit stateChanged();
+    m_state.extraBudget = checked;
+    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbOnlyFor_toggled(bool checked)
@@ -289,8 +257,6 @@ void ControlPanel::on_cbOnlyFor_toggled(bool checked)
     m_state.regionList.clear();
     traverseTreeWidget<ControlPanel *, CustomCheckBox>(ui->treeRegions, this);
     m_state.regionList.removeDuplicates();
-
-    emit stateChanged();
 }
 
 void ControlPanel::process(QTreeWidget *tree_widget, QTreeWidgetItem *tree_item)
@@ -299,4 +265,9 @@ void ControlPanel::process(QTreeWidget *tree_widget, QTreeWidgetItem *tree_item)
     m_state.regionList.append((checkbox->text()));
 
     (void)tree_widget;
+}
+
+void ControlPanel::on_btnUpdate_clicked()
+{
+    emit additionalStateChanged();
 }

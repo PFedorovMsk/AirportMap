@@ -23,13 +23,17 @@ signals:
     void clear();
 
 private slots:
-    void paintAirportsAndHeliports();
-    void paintCities();
+    void paintMainObjects();
+    void paintAdditionalObjects();
 
 private:
     void loadFonts();
     void initControls();
     void initLayouts();
+
+    void makeCitiesQuery(const StateOfParameters &state, QString &citiesQuery);
+    void makeFinancingQuery(const StateOfParameters &state, QString &financingQuery);
+    void makeAirpotsAndHeliportsQuery(const StateOfParameters &state, QString &airportsQuery, QString &heliportsQuery);
 
 private:
     QQuickWidget *m_mapScene;
