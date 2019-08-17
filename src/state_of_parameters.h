@@ -22,7 +22,6 @@ struct StateOfParameters {
     bool runwayType6;
     bool runwayNo;
     bool budget;
-    bool extraBudget;
     bool onlyFor;
 
     QColor airportsColor;
