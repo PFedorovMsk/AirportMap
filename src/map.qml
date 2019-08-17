@@ -6,6 +6,7 @@ import QtPositioning 5.12
 
 
 Rectangle {
+    id: mainItem
     width: 1200
     height: 800
     visible: true
@@ -15,20 +16,59 @@ Rectangle {
     property variant viewOfRussia:      QtPositioning.rectangle(topLeftRussia, bottomRightRussia)
 
     Plugin {
-        id: mapPlugin
+        id: mapBasePlugin
         name: "osm"
         PluginParameter {
-            name: "osm.mapping.host"
-            value: "http://a.tile.openstreetmap.org/"
+            name: "osm.mapping.providersrepository.disabled"
+            value: true
+        }
+        PluginParameter {
+            name: "osm.mapping.custom.host"
+            value: "file:///D:/Tiles/"
+        }
+//        PluginParameter {
+//            name: "osm.mapping.cache.directory"
+//            value: "file:///D:/Tiles/"
+//        }
+    }
+
+    Map {
+        id: mapBase
+        gesture.enabled: true
+        anchors.fill: parent
+        visibleRegion: viewOfRussia
+        maximumZoomLevel: 10
+        z: parent.z + 1
+        plugin: mapBasePlugin
+
+        Component.onCompleted: {
+            for( var i_type in supportedMapTypes ) {
+                if( supportedMapTypes[i_type].name.localeCompare( "Custom URL Map" ) === 0 ) {
+                    activeMapType = supportedMapTypes[i_type]
+                }
+            }
         }
     }
 
     Map {
-        id: map
+        id: mapOverlay1
         anchors.fill: parent
-        plugin: mapPlugin
-        visibleRegion: viewOfRussia
-        maximumZoomLevel: 12
+        plugin: Plugin { name: "itemsoverlay" }
+        gesture.enabled: false
+        center: mapBase.center
+        color: 'transparent'
+        minimumFieldOfView: mapBase.minimumFieldOfView
+        maximumFieldOfView: mapBase.maximumFieldOfView
+        minimumTilt: mapBase.minimumTilt
+        maximumTilt: mapBase.maximumTilt
+        minimumZoomLevel: mapBase.minimumZoomLevel
+        maximumZoomLevel: mapBase.maximumZoomLevel
+        zoomLevel: mapBase.zoomLevel
+        tilt: mapBase.tilt;
+        bearing: mapBase.bearing
+        fieldOfView: mapBase.fieldOfView
+        z: mapBase.z + 1
+        layer.enabled: true
 
         // Рисуем города:
 
@@ -37,6 +77,7 @@ Rectangle {
             model: cities_model
 
             delegate: MapQuickItem {
+                id: mqiCities
                 coordinate: QtPositioning.coordinate(model.latitude_city, model.longitude_city)
                 anchorPoint.x: rectCity.width / 2
                 anchorPoint.y: rectCity.height / 2
@@ -59,20 +100,34 @@ Rectangle {
                         id: textCityName
                         visible: false
                         text: model.name_city
-                        anchors.bottom: parent.top
-                        color: "black"
-                        font.pointSize: 11
-                        antialiasing: true
                     }
-                    onEntered: {
-                        textCityName.visible = true
-                    }
-                    onExited: {
-                        textCityName.visible = false
-                    }
+                    onEntered: mapOverlayText.showLabel(textCityName.text, mapOverlay1.fromCoordinate(mqiCities.coordinate))
+                    onExited:  mapOverlayText.hideLabel()
                 }
             }
         }
+    }
+
+    Map {
+        id: mapOverlay2
+        anchors.fill: parent
+        plugin: Plugin { name: "itemsoverlay" }
+        gesture.enabled: false
+        center: mapBase.center
+        color: 'transparent'
+        minimumFieldOfView: mapBase.minimumFieldOfView
+        maximumFieldOfView: mapBase.maximumFieldOfView
+        minimumTilt: mapBase.minimumTilt
+        maximumTilt: mapBase.maximumTilt
+        minimumZoomLevel: mapBase.minimumZoomLevel
+        maximumZoomLevel: mapBase.maximumZoomLevel
+        zoomLevel: mapBase.zoomLevel
+        tilt: mapBase.tilt;
+        bearing: mapBase.bearing
+        fieldOfView: mapBase.fieldOfView
+        z: mapBase.z + 2
+
+        layer.enabled: true
 
         // Рисуем финансирование аэропортов/вертодромов:
 
@@ -81,6 +136,7 @@ Rectangle {
             model: financing_model
 
             delegate: MapQuickItem {
+                id: mqiFinancing
                 coordinate: QtPositioning.coordinate(model.air_latitude, model.air_longitude)
                 anchorPoint.x: rectFinance.width / 2
                 anchorPoint.y: rectFinance.height / 2
@@ -99,25 +155,14 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
-                    Label {
-                        id: textSum
+                    Text {
+                        id: textFinancingName
                         visible: false
                         text: model.name_ru + " - финансирование:\n -бюджетное: " + model.budget_mil_rub +
-                              " млн.руб\n -внебюджетное: " + model.extrabudget_mil_rub + " млн.руб";
-                        anchors.bottom: parent.top
-                        color: "black"
-                        font.pointSize: 11
-                        antialiasing: true
-                        background: Rectangle {
-                            color: "white"
-                        }
+                              " млн.руб\n -внебюджетное: " +  model.extrabudget_mil_rub + " млн.руб"
                     }
-                    onEntered: {
-                        textSum.visible = true
-                    }
-                    onExited: {
-                        textSum.visible = false
-                    }
+                    onEntered: mapOverlayText.showLabel(textFinancingName.text, mapOverlay2.fromCoordinate(mqiFinancing.coordinate))
+                    onExited:  mapOverlayText.hideLabel()
                 }
             }
         }
@@ -129,6 +174,7 @@ Rectangle {
             model: airport_model
 
             delegate: MapQuickItem {
+                id: mqiAirports
                 coordinate: QtPositioning.coordinate(model.air_latitude, model.air_longitude)
                 anchorPoint.x: rectAirport.width / 2
                 anchorPoint.y: rectAirport.height / 2
@@ -151,17 +197,9 @@ Rectangle {
                         id: textAirportName
                         visible: false
                         text: model.name_ru
-                        anchors.bottom: parent.top
-                        color: "black"
-                        font.pointSize: 11
-                        antialiasing: true
                     }
-                    onEntered: {
-                        textAirportName.visible = true
-                    }
-                    onExited: {
-                        textAirportName.visible = false
-                    }
+                    onEntered: mapOverlayText.showLabel(textAirportName.text, mapOverlay2.fromCoordinate(mqiAirports.coordinate))
+                    onExited:  mapOverlayText.hideLabel()
                 }
             }
         }
@@ -173,6 +211,7 @@ Rectangle {
             model: heliport_model
 
             delegate: MapQuickItem {
+                id: mqiHelipoirts
                 coordinate: QtPositioning.coordinate(model.air_latitude, model.air_longitude)
                 anchorPoint.x: rectHeliport.width / 2
                 anchorPoint.y: rectHeliport.height / 2
@@ -195,20 +234,57 @@ Rectangle {
                         id: textHeliportName
                         visible: false
                         text: model.name_ru
-                        anchors.bottom: parent.top
-                        color: "black"
-                        font.pointSize: 11
-                        antialiasing: true
                     }
-                    onEntered: {
-                        textHeliportName.visible = true
-                    }
-                    onExited: {
-                        textHeliportName.visible = false
-                    }
+                    onEntered: mapOverlayText.showLabel(textHeliportName.text, mapOverlay2.fromCoordinate(mqiHelipoirts.coordinate))
+                    onExited:  mapOverlayText.hideLabel()
                 }
             }
         }
-
     }
+
+    Map {
+        id: mapOverlayText
+        anchors.fill: parent
+        plugin: Plugin { name: "itemsoverlay" }
+        gesture.enabled: false
+        center: mapBase.center
+        color: 'transparent'
+        minimumFieldOfView: mapBase.minimumFieldOfView
+        maximumFieldOfView: mapBase.maximumFieldOfView
+        minimumTilt: mapBase.minimumTilt
+        maximumTilt: mapBase.maximumTilt
+        minimumZoomLevel: mapBase.minimumZoomLevel
+        maximumZoomLevel: mapBase.maximumZoomLevel
+        zoomLevel: mapBase.zoomLevel
+        tilt: mapBase.tilt;
+        bearing: mapBase.bearing
+        fieldOfView: mapBase.fieldOfView
+        z: mapBase.z + 3
+        layer.enabled: true
+
+        Label {
+            id: textSum
+            visible: false
+            color: "black"
+            font.pointSize: 11
+            antialiasing: true
+            background: Rectangle {
+                color: "white"
+            }
+        }
+
+        function showLabel(text, point)
+        {
+            textSum.text = text
+            textSum.x = point.x + 25
+            textSum.y = point.y - 25
+            textSum.visible = true
+        }
+
+        function hideLabel()
+        {
+            textSum.visible = false
+        }
+    }
+
 }
