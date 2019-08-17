@@ -59,7 +59,6 @@ private slots:
     void on_cbRunwayType6_toggled(bool checked);
     void on_cbRunwayNo_toggled(bool checked);
     void on_cbBudget_toggled(bool checked);
-    void on_cbExtraBudget_toggled(bool checked);
     void on_cbOnlyFor_toggled(bool checked);
     void on_btnUpdate_clicked();
 

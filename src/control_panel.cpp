@@ -88,10 +88,9 @@ void ControlPanel::on_btnAirportsColor_clicked()
         return;
     }
     m_state.airportsColor = ui->btnAirportsColor->color();
-    if (ui->cbAirports->isChecked() == false) {
-        return;
-    }
-    emit mainStateChanged();
+    if (ui->cbAirports->isChecked()) {
+        emit mainStateChanged();
+    } 
 }
 
 void ControlPanel::on_btnHeliportsColor_clicked()
@@ -100,10 +99,9 @@ void ControlPanel::on_btnHeliportsColor_clicked()
         return;
     }
     m_state.heliportsColor = ui->btnHeliportsColor->color();
-    if (ui->cbHeliports->isChecked() == false) {
-        return;
+    if (ui->cbHeliports->isChecked()) {
+        emit mainStateChanged();
     }
-    emit mainStateChanged();
 }
 
 void ControlPanel::on_btnCitiesColor_clicked()
@@ -112,10 +110,9 @@ void ControlPanel::on_btnCitiesColor_clicked()
         return;
     }
     m_state.citiesColor = ui->btnCitiesColor->color();
-    if (ui->cbCities->isChecked() == false) {
-        return;
+    if (ui->cbCities->isChecked()) {
+        //emit additionalStateChanged();
     }
-    //emit mainStateChanged();
 }
 
 void ControlPanel::on_btnFinancingColor_clicked()
@@ -124,10 +121,9 @@ void ControlPanel::on_btnFinancingColor_clicked()
         return;
     }
     m_state.financingColor = ui->btnFinancingColor->color();
-    if (ui->cbFinancing->isChecked() == false) {
-        return;
+    if (ui->cbFinancing->isChecked()) {
+        emit mainStateChanged();
     }
-    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbInternational_toggled(bool checked)
@@ -235,16 +231,9 @@ void ControlPanel::on_cbBudget_toggled(bool checked)
         return;
     }
     m_state.budget = checked;
-    emit mainStateChanged();
-}
-
-void ControlPanel::on_cbExtraBudget_toggled(bool checked)
-{
-    if (m_state.extraBudget == checked) {
-        return;
+    if (ui->cbFinancing->isChecked()) {
+        emit mainStateChanged();
     }
-    m_state.extraBudget = checked;
-    emit mainStateChanged();
 }
 
 void ControlPanel::on_cbOnlyFor_toggled(bool checked)
