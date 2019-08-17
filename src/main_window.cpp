@@ -11,28 +11,17 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_mapScene(new QQuickWidget(QUrl(QStringLiteral("qrc:/src/map.qml"))))
     , m_controlPanel(new ControlPanel)
+    , m_databaseHostName("127.0.0.1")
+    , m_databaseDatabaseName("Test")
+    , m_databaseUserName("postgres")
+    , m_databasePassword("privet1992")
 {
-    m_database = QSqlDatabase::addDatabase("QPSQL");
-    m_database.setHostName("127.0.0.1");
-    m_database.setDatabaseName("Test");
-    m_database.setUserName("postgres");
-    m_database.setPassword("privet1992");
-    m_database.open();
-
+    initDatabase();
     loadFonts();
-    initControls();
+    initMapScene();
+    initControlPanel();
     initLayouts();
-
-    QRect screenRect = QGuiApplication::primaryScreen()->availableGeometry();
-    int   dx         = 20;
-    int   dy         = 50;
-    setGeometry(screenRect.x() + dx, screenRect.y() + dy, screenRect.width() - 2 * dx, screenRect.height() - 2 * dy);
-    this->showMaximized();
-
-    m_mapScene->rootContext()->setContextProperty("cities_model", nullptr);
-    m_mapScene->rootContext()->setContextProperty("financing_model", nullptr);
-    m_mapScene->rootContext()->setContextProperty("airport_model", nullptr);
-    m_mapScene->rootContext()->setContextProperty("heliport_model", nullptr);
+    initScreenRect();
 
     connect(m_controlPanel, SIGNAL(mainStateChanged()), this, SLOT(paintMainObjects()));
     connect(m_controlPanel, SIGNAL(additionalStateChanged()), this, SLOT(paintAdditionalObjects()));
@@ -45,17 +34,39 @@ MainWindow::~MainWindow()
     m_database.close();
 }
 
+void MainWindow::initDatabase()
+{
+    m_database = QSqlDatabase::addDatabase("QPSQL");
+
+    m_database.setHostName("127.0.0.1");
+    m_database.setDatabaseName("Test");
+    m_database.setUserName("postgres");
+    m_database.setPassword("privet1992");
+
+    if (m_database.open()) {
+        return;
+    }
+}
+
 void MainWindow::loadFonts()
 {
     this->setFont(FontManager::instance().regular(GuiConfig::FONT_SIZE_NORMAL));
 }
 
-void MainWindow::initControls()
+void MainWindow::initMapScene()
 {
+    m_mapScene->rootContext()->setContextProperty("cities_model", nullptr);
+    m_mapScene->rootContext()->setContextProperty("financing_model", nullptr);
+    m_mapScene->rootContext()->setContextProperty("airport_model", nullptr);
+    m_mapScene->rootContext()->setContextProperty("heliport_model", nullptr);
+
     m_mapScene->setResizeMode(QQuickWidget::SizeRootObjectToView);
     m_mapScene->setMinimumWidth(512);
     m_mapScene->setMinimumHeight(512);
+}
 
+void MainWindow::initControlPanel()
+{
     TwoLevelTreeItems data;
     data.topLevels = {"Центральный ФО", "Северо-Западный ФО", "Южный ФО",     "Северо-Кавказский ФО",
                       "Приволжский ФО", "Уральский ФО",       "Сибирский ФО", "Дальневосточный ФО"};
@@ -102,6 +113,15 @@ void MainWindow::initLayouts()
     centralWidget()->setMinimumWidth(3 * GuiConfig::LAYOUT_MARGIN_BIG + m_mapScene->minimumWidth() +
                                      m_controlPanel->minimumWidth());
     setMinimumWidth(this->layout()->margin() * 2 + centralWidget()->minimumWidth());
+}
+
+void MainWindow::initScreenRect()
+{
+    QRect screenRect = QGuiApplication::primaryScreen()->availableGeometry();
+    int   dx         = 20;
+    int   dy         = 50;
+    setGeometry(screenRect.x() + dx, screenRect.y() + dy, screenRect.width() - 2 * dx, screenRect.height() - 2 * dy);
+    this->showMaximized();
 }
 
 // slots:
@@ -219,6 +239,9 @@ void MainWindow::makeFinancingQuery(const StateOfParameters &state, QString &fin
     financingQuery += "SELECT TA.name_ru, TA.air_latitude, TA.air_longitude, TE.budget_mil_rub::numeric, ";
     financingQuery += "TE.extrabudget_mil_rub::numeric, SUM(budget_mil_rub + extrabudget_mil_rub)::numeric AS summa ";
     financingQuery += "FROM tab_airports AS TA INNER JOIN tab_economic as TE ON TA.id_air = TE.id_air ";
+    if (state.budget) {
+        financingQuery += "WHERE TE.extrabudget_mil_rub::numeric <= 0 ";
+    }
     financingQuery +=
         "GROUP BY TA.name_ru, TA.air_latitude, TA.air_longitude, TE.budget_mil_rub, TE.extrabudget_mil_rub ";
 }

@@ -27,9 +27,12 @@ private slots:
     void paintAdditionalObjects();
 
 private:
+    void initDatabase();
     void loadFonts();
-    void initControls();
+    void initMapScene();
+    void initControlPanel();
     void initLayouts();
+    void initScreenRect();
 
     void makeCitiesQuery(const StateOfParameters &state, QString &citiesQuery);
     void makeFinancingQuery(const StateOfParameters &state, QString &financingQuery);
@@ -39,6 +42,11 @@ private:
     QQuickWidget *m_mapScene;
     ControlPanel *m_controlPanel;
     QSqlDatabase  m_database;
+
+    QString m_databaseHostName;
+    QString m_databaseDatabaseName;
+    QString m_databaseUserName;
+    QString m_databasePassword;
 };
 
 #endif // MAIN_WINDOW_H
