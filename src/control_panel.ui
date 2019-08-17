@@ -312,38 +312,13 @@
        </layout>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_7">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QCheckBox" name="cbBudget">
+        <property name="text">
+         <string>Только бюджетное финансирование</string>
         </property>
-        <property name="title">
-         <string>Тип финансирования</string>
+        <property name="checked">
+         <bool>false</bool>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QCheckBox" name="cbBudget">
-           <property name="text">
-            <string>Бюджетное</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="cbExtraBudget">
-           <property name="text">
-            <string>Небюджетное</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </widget>
       </item>
      </layout>
