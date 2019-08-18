@@ -1,4 +1,4 @@
-QT             += core gui location quickwidgets sql
+QT             += core gui location quickwidgets sql printsupport
 CONFIG         += c++11
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -19,20 +19,26 @@ SOURCES += \
     src/control_panel.cpp \
     src/custom_check_box.cpp \
     src/font_manager.cc \
+    src/graph_sheet.cpp \
+    src/graph_window.cpp \
     src/main.cpp \
     src/main_window.cpp \
     src/sql_query_model.cpp \
-    src/state_of_parameters.cpp
+    src/state_of_parameters.cpp \
+    third_party/qcustomplot/qcustomplot.cc
 
 HEADERS += \
     src/color_select_button.h \
     src/control_panel.h \
     src/custom_check_box.h \
     src/font_manager.h \
+    src/graph_sheet.h \
+    src/graph_window.h \
     src/gui_config.h \
     src/main_window.h \
     src/sql_query_model.h \
-    src/state_of_parameters.h
+    src/state_of_parameters.h \
+    third_party/qcustomplot/qcustomplot.h
 
 RESOURCES += \
     resources.qrc
