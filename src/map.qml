@@ -26,10 +26,10 @@ Rectangle {
             name: "osm.mapping.custom.host"
             value: "file:///D:/Tiles/"
         }
-//        PluginParameter {
-//            name: "osm.mapping.cache.directory"
-//            value: "file:///D:/Tiles/"
-//        }
+        PluginParameter {
+            name: "osm.mapping.cache.directory"
+            value: "file:///D:/Tiles/"
+        }
     }
 
     Map {
@@ -51,7 +51,7 @@ Rectangle {
     }
 
     Map {
-        id: mapOverlay1
+        id: mapOverlayCities
         anchors.fill: parent
         plugin: Plugin { name: "itemsoverlay" }
         gesture.enabled: false
@@ -101,15 +101,84 @@ Rectangle {
                         visible: false
                         text: model.name_city
                     }
-                    onEntered: mapOverlayText.showLabel(textCityName.text, mapOverlay1.fromCoordinate(mqiCities.coordinate))
-                    onExited:  mapOverlayText.hideLabel()
+                    onEntered: mapOverlayLabels.showLabel(textCityName.text, mapOverlayCities.fromCoordinate(mqiCities.coordinate))
+                    onExited:  mapOverlayLabels.hideLabel()
+                }
+            }
+        }
+
+        MapItemView {
+            id: stopsView
+            model: stops_model
+
+            delegate: MapQuickItem {
+                id: mqiStops
+                coordinate: QtPositioning.coordinate(model.latitude_city, model.longitude_city)
+                anchorPoint.x: rectCity.width / 2
+                anchorPoint.y: rectCity.height / 2
+
+                sourceItem: Rectangle {
+                    id: rectStop
+                    color: model.color
+                    radius: model.radius
+                    width: radius * 2
+                    height: radius * 2
+                    border.width: 1
+                    border.color: model.borderColor
+                    smooth: false
+                }
+            }
+        }
+
+        MapItemView {
+            id: portsView
+            model: ports_model
+
+            delegate: MapQuickItem {
+                id: mqiPorts
+                coordinate: QtPositioning.coordinate(model.latitude_city, model.longitude_city)
+                anchorPoint.x: rectCity.width / 2
+                anchorPoint.y: rectCity.height / 2
+
+                sourceItem: Rectangle {
+                    id: rectPort
+                    color: model.color
+                    radius: model.radius
+                    width: radius * 2
+                    height: radius * 2
+                    border.width: 1
+                    border.color: model.borderColor
+                    smooth: false
+                }
+            }
+        }
+
+        MapItemView {
+            id: trainStationsView
+            model: train_stations_model
+
+            delegate: MapQuickItem {
+                id: mqiTrainStations
+                coordinate: QtPositioning.coordinate(model.latitude_city, model.longitude_city)
+                anchorPoint.x: rectCity.width / 2
+                anchorPoint.y: rectCity.height / 2
+
+                sourceItem: Rectangle {
+                    id: rectTrainStation
+                    color: model.color
+                    radius: model.radius
+                    width: radius * 2
+                    height: radius * 2
+                    border.width: 1
+                    border.color: model.borderColor
+                    smooth: false
                 }
             }
         }
     }
 
     Map {
-        id: mapOverlay2
+        id: mapOverlayMainObjects
         anchors.fill: parent
         plugin: Plugin { name: "itemsoverlay" }
         gesture.enabled: false
@@ -126,7 +195,6 @@ Rectangle {
         bearing: mapBase.bearing
         fieldOfView: mapBase.fieldOfView
         z: mapBase.z + 2
-
         layer.enabled: true
 
         // Рисуем финансирование аэропортов/вертодромов:
@@ -161,8 +229,8 @@ Rectangle {
                         text: model.name_ru + " - финансирование:\n -бюджетное: " + model.budget_mil_rub +
                               " млн.руб\n -внебюджетное: " +  model.extrabudget_mil_rub + " млн.руб"
                     }
-                    onEntered: mapOverlayText.showLabel(textFinancingName.text, mapOverlay2.fromCoordinate(mqiFinancing.coordinate))
-                    onExited:  mapOverlayText.hideLabel()
+                    onEntered: mapOverlayLabels.showLabel(textFinancingName.text, mapOverlayMainObjects.fromCoordinate(mqiFinancing.coordinate))
+                    onExited:  mapOverlayLabels.hideLabel()
                 }
             }
         }
@@ -198,8 +266,8 @@ Rectangle {
                         visible: false
                         text: model.name_ru
                     }
-                    onEntered: mapOverlayText.showLabel(textAirportName.text, mapOverlay2.fromCoordinate(mqiAirports.coordinate))
-                    onExited:  mapOverlayText.hideLabel()
+                    onEntered: mapOverlayLabels.showLabel(textAirportName.text, mapOverlayMainObjects.fromCoordinate(mqiAirports.coordinate))
+                    onExited:  mapOverlayLabels.hideLabel()
                 }
             }
         }
@@ -235,15 +303,15 @@ Rectangle {
                         visible: false
                         text: model.name_ru
                     }
-                    onEntered: mapOverlayText.showLabel(textHeliportName.text, mapOverlay2.fromCoordinate(mqiHelipoirts.coordinate))
-                    onExited:  mapOverlayText.hideLabel()
+                    onEntered: mapOverlayLabels.showLabel(textHeliportName.text, mapOverlayMainObjects.fromCoordinate(mqiHelipoirts.coordinate))
+                    onExited:  mapOverlayLabels.hideLabel()
                 }
             }
         }
     }
 
     Map {
-        id: mapOverlayText
+        id: mapOverlayLabels
         anchors.fill: parent
         plugin: Plugin { name: "itemsoverlay" }
         gesture.enabled: false
