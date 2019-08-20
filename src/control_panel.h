@@ -47,6 +47,9 @@ private slots:
     void on_btnHeliportsColor_clicked();
     void on_btnCitiesColor_clicked();
     void on_btnFinancingColor_clicked();
+    void on_btnStopsColor_clicked();
+    void on_btnPortsColor_clicked();
+    void on_btnTrainStationsColor_clicked();
     void on_cbInternational_toggled(bool checked);
     void on_cbDomestic_toggled(bool checked);
     void on_cbRunwayCoverHard_toggled(bool checked);
@@ -59,8 +62,12 @@ private slots:
     void on_cbRunwayType6_toggled(bool checked);
     void on_cbRunwayNo_toggled(bool checked);
     void on_cbBudget_toggled(bool checked);
-    void on_cbOnlyFor_toggled(bool checked);
-    void on_btnUpdate_clicked();
+    void on_cbStops_toggled(bool checked);
+    void on_cbPorts_toggled(bool checked);
+    void on_cbTrainStations_toggled(bool checked);
+    void on_btnUpdate_clicked();   
+    void on_sbYear_valueChanged(int year);
+    void on_sbRadius_valueChanged(int radius);
 
 private:
     Ui::ControlPanel *ui;

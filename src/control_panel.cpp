@@ -14,6 +14,9 @@ ControlPanel::ControlPanel(QWidget *parent)
     ui->btnHeliportsColor->setColor(m_state.heliportsColor);
     ui->btnCitiesColor->setColor(m_state.citiesColor);
     ui->btnFinancingColor->setColor(m_state.financingColor);
+    ui->btnStopsColor->setColor(m_state.stopsColor);
+    ui->btnPortsColor->setColor(m_state.portsColor);
+    ui->btnTrainStationsColor->setColor(m_state.trainStationsColor);
 }
 
 ControlPanel::~ControlPanel()
@@ -64,14 +67,6 @@ void ControlPanel::on_cbHeliports_toggled(bool checked)
     emit mainStateChanged();
 }
 
-void ControlPanel::on_cbCities_toggled(bool checked)
-{
-    if (m_state.cities == checked) {
-        return;
-    }
-    m_state.cities = checked;
-}
-
 void ControlPanel::on_cbFinancing_toggled(bool checked)
 {
     if (m_state.financing == checked) {
@@ -80,6 +75,27 @@ void ControlPanel::on_cbFinancing_toggled(bool checked)
     m_state.financing = checked;
     emit mainStateChanged();
 }
+
+void ControlPanel::on_cbCities_toggled(bool checked)
+{
+    m_state.cities = checked;
+}
+
+void ControlPanel::on_cbStops_toggled(bool checked)
+{
+    m_state.stops = checked;
+}
+
+void ControlPanel::on_cbPorts_toggled(bool checked)
+{
+    m_state.ports = checked;
+}
+
+void ControlPanel::on_cbTrainStations_toggled(bool checked)
+{
+    m_state.trainStations = checked;
+}
+
 
 void ControlPanel::on_btnAirportsColor_clicked()
 {
@@ -104,17 +120,6 @@ void ControlPanel::on_btnHeliportsColor_clicked()
     }
 }
 
-void ControlPanel::on_btnCitiesColor_clicked()
-{
-    if (m_state.citiesColor == ui->btnCitiesColor->color()) {
-        return;
-    }
-    m_state.citiesColor = ui->btnCitiesColor->color();
-    if (ui->cbCities->isChecked()) {
-        //emit additionalStateChanged();
-    }
-}
-
 void ControlPanel::on_btnFinancingColor_clicked()
 {
     if (m_state.financingColor == ui->btnFinancingColor->color()) {
@@ -124,6 +129,26 @@ void ControlPanel::on_btnFinancingColor_clicked()
     if (ui->cbFinancing->isChecked()) {
         emit mainStateChanged();
     }
+}
+
+void ControlPanel::on_btnCitiesColor_clicked()
+{
+    m_state.citiesColor = ui->btnCitiesColor->color();
+}
+
+void ControlPanel::on_btnStopsColor_clicked()
+{
+    m_state.stopsColor = ui->btnStopsColor->color();
+}
+
+void ControlPanel::on_btnPortsColor_clicked()
+{
+    m_state.portsColor = ui->btnPortsColor->color();
+}
+
+void ControlPanel::on_btnTrainStationsColor_clicked()
+{
+    m_state.trainStationsColor = ui->btnTrainStationsColor->color();
 }
 
 void ControlPanel::on_cbInternational_toggled(bool checked)
@@ -236,18 +261,6 @@ void ControlPanel::on_cbBudget_toggled(bool checked)
     }
 }
 
-void ControlPanel::on_cbOnlyFor_toggled(bool checked)
-{
-    if (m_state.onlyFor == checked) {
-        return;
-    }
-    m_state.onlyFor = checked;
-
-    m_state.regionList.clear();
-    traverseTreeWidget<ControlPanel *, CustomCheckBox>(ui->treeRegions, this);
-    m_state.regionList.removeDuplicates();
-}
-
 void ControlPanel::process(QTreeWidget *tree_widget, QTreeWidgetItem *tree_item)
 {
     CustomCheckBox *checkbox = static_cast<CustomCheckBox *>(ui->treeRegions->itemWidget(tree_item, 0));
@@ -258,5 +271,19 @@ void ControlPanel::process(QTreeWidget *tree_widget, QTreeWidgetItem *tree_item)
 
 void ControlPanel::on_btnUpdate_clicked()
 {
+    m_state.regionList.clear();
+    traverseTreeWidget<ControlPanel *, CustomCheckBox>(ui->treeRegions, this);
+    m_state.regionList.removeDuplicates();
+
     emit additionalStateChanged();
+}
+
+void ControlPanel::on_sbYear_valueChanged(int year)
+{
+    m_state.year = year;
+}
+
+void ControlPanel::on_sbRadius_valueChanged(int radius)
+{
+    m_state.radius = radius;
 }
