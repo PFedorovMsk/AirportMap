@@ -126,9 +126,9 @@ void GraphWindow::initPlotter()
     connect(m_plotter->xAxis, SIGNAL(rangeChanged(QCPRange)), m_plotter->xAxis2, SLOT(setRange(QCPRange)));
     connect(m_plotter->yAxis, SIGNAL(rangeChanged(QCPRange)), m_plotter->yAxis2, SLOT(setRange(QCPRange)));
 
-    QFontMetrics *metric    = new QFontMetrics(m_plotterSubTitleFont);
-    int           minWidth  = metric->width(tr("шаг интегрирования 0.0001, между измерениями 9999.9999"));
-    int           minHeight = int(0.6 * minWidth);
+    QFontMetrics *metric = new QFontMetrics(m_plotterSubTitleFont);
+    int minWidth = metric->horizontalAdvance(tr("шаг интегрирования 0.0001, между измерениями 9999.9999"));
+    int minHeight = int(0.6 * minWidth);
 
     m_plotter->setMinimumWidth(minWidth);
     m_plotter->setMinimumHeight(minHeight);
@@ -282,7 +282,7 @@ void GraphWindow::onMoveLegend()
 void GraphWindow::onClear()
 {
     m_sheets.clear();
-    setCountSheets(1);
+    setSheetCount(1);
     updateMenu();
 }
 
@@ -379,7 +379,7 @@ void GraphWindow::onShowCurve(QAction *action)
     }
 }
 
-int GraphWindow::countSheets() const
+int GraphWindow::sheetCount() const
 {
     return m_sheets.size();
 }
@@ -396,7 +396,7 @@ GraphSheet &GraphWindow::currentSheet()
     return *m_currentSheet;
 }
 
-void GraphWindow::setCountSheets(int count)
+void GraphWindow::setSheetCount(int count)
 {
     m_sheets.resize(count);
     m_currentSheet = &(m_sheets[0]);

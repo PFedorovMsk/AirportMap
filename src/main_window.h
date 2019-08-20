@@ -7,6 +7,7 @@
 
 #include "src/control_panel.h"
 #include "src/font_manager.h"
+#include "src/graph_window.h"
 #include "src/gui_config.h"
 #include "src/sql_query_model.h"
 
@@ -26,6 +27,9 @@ private slots:
     void paintMainObjects();
     void paintAdditionalObjects();
 
+    void paintGraphPopulation();
+    void paintGraph();
+
 private:
     void initDatabase();
     void loadFonts();
@@ -33,15 +37,18 @@ private:
     void initControlPanel();
     void initLayouts();
     void initScreenRect();
+    void initGraphWindow();
 
-    void makeCitiesQuery(const StateOfParameters &state, QString &citiesQuery);
+    void makeCitiesQuery(const StateOfParameters &state, QString &citiesQuery, QString &stopsQuery, QString &portsQuery,
+                         QString &trainStationsQuery);
     void makeFinancingQuery(const StateOfParameters &state, QString &financingQuery);
     void makeAirpotsAndHeliportsQuery(const StateOfParameters &state, QString &airportsQuery, QString &heliportsQuery);
 
 private:
+    QSqlDatabase  m_database;
+    GraphWindow * m_graphWindow;
     QQuickWidget *m_mapScene;
     ControlPanel *m_controlPanel;
-    QSqlDatabase  m_database;
 
     QString m_databaseHostName;
     QString m_databaseDatabaseName;

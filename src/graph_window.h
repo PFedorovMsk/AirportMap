@@ -30,7 +30,7 @@ public:
     ~GraphWindow();
 
     //! \brief Возвращает количество страниц.
-    int countSheets() const;
+    int sheetCount() const;
 
     //! \brief Возвращает ссылку на страницу с номером index.
     GraphSheet &sheet(int index);
@@ -39,7 +39,7 @@ public:
     GraphSheet &currentSheet();
 
     //! \brief Устанавливает количество страниц
-    void setCountSheets(int count);
+    void setSheetCount(int count);
 
     //! \brief Обновляет поле рисовальщика QCustomPlot (заставляет перерисовать себя).
     void updatePlotter();
