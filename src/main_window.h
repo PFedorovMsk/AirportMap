@@ -6,6 +6,7 @@
 #include <QQuickWidget>
 
 #include "src/control_panel.h"
+#include "src/database_editor_panel.h"
 #include "src/font_manager.h"
 #include "src/graph_window.h"
 #include "src/gui_config.h"
@@ -35,6 +36,7 @@ private:
     void loadFonts();
     void initMapScene();
     void initControlPanel();
+    void initDatabaseEditor();
     void initLayouts();
     void initScreenRect();
     void initGraphWindow();
@@ -44,11 +46,19 @@ private:
     void makeFinancingQuery(const StateOfParameters &state, QString &financingQuery);
     void makeAirpotsAndHeliportsQuery(const StateOfParameters &state, QString &airportsQuery, QString &heliportsQuery);
 
+private slots:
+    void insertRow();
+    void removeRow();
+    void changeTable(const QString &tableName);
+
 private:
-    QSqlDatabase  m_database;
-    GraphWindow * m_graphWindow;
-    QQuickWidget *m_mapScene;
-    ControlPanel *m_controlPanel;
+    QSqlDatabase         m_database;
+    GraphWindow *        m_graphWindow;
+    QQuickWidget *       m_mapScene;
+    ControlPanel *       m_controlPanel;
+    DatabaseEditorPanel *m_databaseEditorPanel;
+    QSqlTableModel *     m_sqlTableModel;
+    QTableView *         m_databaseView;
 
     QString m_databaseHostName;
     QString m_databaseDatabaseName;
