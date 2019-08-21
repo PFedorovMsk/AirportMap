@@ -10,6 +10,7 @@
 #include "src/font_manager.h"
 #include "src/graph_window.h"
 #include "src/gui_config.h"
+#include "src/query_maker.h"
 #include "src/sql_query_model.h"
 
 
@@ -32,19 +33,14 @@ private slots:
     void paintGraph();
 
 private:
-    void initDatabase();
     void loadFonts();
+    void initDatabase();
     void initMapScene();
     void initControlPanel();
     void initDatabaseEditor();
     void initLayouts();
     void initScreenRect();
     void initGraphWindow();
-
-    void makeCitiesQuery(const StateOfParameters &state, QString &citiesQuery, QString &stopsQuery, QString &portsQuery,
-                         QString &trainStationsQuery);
-    void makeFinancingQuery(const StateOfParameters &state, QString &financingQuery);
-    void makeAirpotsAndHeliportsQuery(const StateOfParameters &state, QString &airportsQuery, QString &heliportsQuery);
 
 private slots:
     void insertRow();

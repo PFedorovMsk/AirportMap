@@ -24,6 +24,7 @@ SOURCES += \
     src/graph_window.cpp \
     src/main.cpp \
     src/main_window.cpp \
+    src/query_maker.cpp \
     src/sql_query_model.cpp \
     src/state_of_parameters.cpp \
     third_party/qcustomplot/qcustomplot.cc
@@ -38,6 +39,7 @@ HEADERS += \
     src/graph_window.h \
     src/gui_config.h \
     src/main_window.h \
+    src/query_maker.h \
     src/sql_query_model.h \
     src/state_of_parameters.h \
     third_party/qcustomplot/qcustomplot.h
