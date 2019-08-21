@@ -28,7 +28,8 @@ struct StateOfParameters {
 
     QColor airportsColor;
     QColor heliportsColor;
-    QColor citiesColor;
+    QColor citiesColor1;
+    QColor citiesColor2;
     QColor financingColor;
     QColor stopsColor;
     QColor portsColor;
