@@ -12,6 +12,9 @@ MainWindow::MainWindow(QWidget *parent)
     , m_graphWindow(new GraphWindow)
     , m_mapScene(new QQuickWidget(QUrl(QStringLiteral("qrc:/src/map.qml"))))
     , m_controlPanel(new ControlPanel)
+    , m_databaseEditorPanel(new DatabaseEditorPanel)
+    , m_sqlTableModel(nullptr)
+    , m_databaseView(new QTableView)
     , m_databaseHostName("127.0.0.1")
     , m_databaseDatabaseName("Test2")
     , m_databaseUserName("postgres")
@@ -21,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     loadFonts();
     initMapScene();
     initControlPanel();
+    initDatabaseEditor();
     initLayouts();
     initScreenRect();
     initGraphWindow();
@@ -94,6 +98,37 @@ void MainWindow::initControlPanel()
     m_controlPanel->setMinimumWidth(m_controlPanel->sizeHint().width());
 }
 
+void MainWindow::initDatabaseEditor()
+{
+    QSqlQuery sqlQuery("", m_database);
+    QString   query = "SELECT table_name FROM information_schema.tables WHERE table_schema ";
+    query += "NOT IN ('information_schema', 'pg_catalog') AND table_schema IN('public')";
+    sqlQuery.exec(query);
+    QStringList list;
+    while (sqlQuery.next()) {
+        list.append(sqlQuery.value(0).toString());
+    }
+
+    m_databaseEditorPanel->setTablesList(list);
+    m_databaseEditorPanel->setMinimumWidth(m_databaseEditorPanel->sizeHint().width());
+
+    m_sqlTableModel = new QSqlTableModel(nullptr, m_database);
+    m_sqlTableModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    m_sqlTableModel->setTable(list.first());
+    m_sqlTableModel->select();
+    m_databaseView->setModel(m_sqlTableModel);
+
+    m_databaseView->setAlternatingRowColors(true);
+    m_databaseView->setSortingEnabled(true);
+    m_databaseView->horizontalHeader()->setVisible(true);
+
+    connect(m_databaseEditorPanel, SIGNAL(save()), m_sqlTableModel, SLOT(submitAll()));
+    connect(m_databaseEditorPanel, SIGNAL(undo()), m_sqlTableModel, SLOT(revertAll()));
+    connect(m_databaseEditorPanel, SIGNAL(insert()), this, SLOT(insertRow()));
+    connect(m_databaseEditorPanel, SIGNAL(remove()), this, SLOT(removeRow()));
+    connect(m_databaseEditorPanel, SIGNAL(tableListChanged(QString)), this, SLOT(changeTable(QString)));
+}
+
 void MainWindow::initLayouts()
 {
     // tab 1:
@@ -112,18 +147,27 @@ void MainWindow::initLayouts()
     QHBoxLayout *tab2Layout = new QHBoxLayout;
     tab2Layout->setMargin(GuiConfig::LAYOUT_MARGIN_SMALL);
     tab2Layout->setSpacing(GuiConfig::LAYOUT_SPACING_SMALL);
+    tab2Layout->addWidget(m_databaseView);
+    tab2Layout->addWidget(m_databaseEditorPanel);
     tab2Widget->setLayout(tab2Layout);
 
     // main:
 
     QTabWidget *mainWidget = new QTabWidget;
     mainWidget->addTab(tab1Widget, tr("Карта"));
-    mainWidget->addTab(tab2Widget, tr("Другое"));
+    mainWidget->addTab(tab2Widget, tr("Редактор БД"));
 
     setCentralWidget(mainWidget);
 
-    centralWidget()->setMinimumWidth(3 * GuiConfig::LAYOUT_MARGIN_BIG + m_mapScene->minimumWidth() +
-                                     m_controlPanel->minimumWidth());
+
+    int minPanelWidth = m_controlPanel->minimumWidth();
+    if (int width = m_databaseEditorPanel->minimumWidth() > minPanelWidth) {
+        minPanelWidth = width;
+    }
+    m_controlPanel->setMinimumWidth(minPanelWidth);
+    m_databaseEditorPanel->setMinimumWidth(minPanelWidth);
+
+    centralWidget()->setMinimumWidth(3 * GuiConfig::LAYOUT_MARGIN_BIG + m_mapScene->minimumWidth() + minPanelWidth);
     setMinimumWidth(this->layout()->margin() * 2 + centralWidget()->minimumWidth());
 }
 
@@ -149,7 +193,25 @@ void MainWindow::initGraphWindow()
     m_graphWindow->hide();
 }
 
-// slots:
+void MainWindow::insertRow()
+{
+    m_sqlTableModel->insertRow(m_sqlTableModel->rowCount());
+}
+
+void MainWindow::removeRow()
+{
+    int selectedRow = m_databaseView->currentIndex().row();
+    if (selectedRow >= 0 && selectedRow < m_sqlTableModel->rowCount()) {
+        m_sqlTableModel->removeRow(selectedRow);
+    }
+}
+
+void MainWindow::changeTable(const QString &tableName)
+{
+    m_sqlTableModel->setTable(tableName);
+    m_sqlTableModel->select();
+    m_databaseView->setModel(m_sqlTableModel);
+}
 
 inline QColor colorWithoutAlpha(const QColor &color)
 {

@@ -18,6 +18,7 @@ SOURCES += \
     src/color_select_button.cpp \
     src/control_panel.cpp \
     src/custom_check_box.cpp \
+    src/database_editor_panel.cpp \
     src/font_manager.cc \
     src/graph_sheet.cpp \
     src/graph_window.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     src/color_select_button.h \
     src/control_panel.h \
     src/custom_check_box.h \
+    src/database_editor_panel.h \
     src/font_manager.h \
     src/graph_sheet.h \
     src/graph_window.h \
@@ -44,4 +46,5 @@ RESOURCES += \
     resources.qrc
 
 FORMS += \
-    src/control_panel.ui
+    src/control_panel.ui \
+    src/database_editor_panel.ui
