@@ -18,18 +18,18 @@ Rectangle {
     Plugin {
         id: mapBasePlugin
         name: "osm"
-        PluginParameter {
-            name: "osm.mapping.providersrepository.disabled"
-            value: true
-        }
-        PluginParameter {
-            name: "osm.mapping.custom.host"
-            value: "file:///D:/Tiles/"
-        }
-        PluginParameter {
-            name: "osm.mapping.cache.directory"
-            value: "file:///D:/Tiles/"
-        }
+//        PluginParameter {
+//            name: "osm.mapping.providersrepository.disabled"
+//            value: true
+//        }
+//        PluginParameter {
+//            name: "osm.mapping.custom.host"
+//            value: "file:///D:/Tiles/"
+//        }
+//        PluginParameter {
+//            name: "osm.mapping.cache.directory"
+//            value: "file:///D:/Tiles/"
+//        }
     }
 
     Map {
@@ -41,13 +41,13 @@ Rectangle {
         z: parent.z + 1
         plugin: mapBasePlugin
 
-        Component.onCompleted: {
-            for( var i_type in supportedMapTypes ) {
-                if( supportedMapTypes[i_type].name.localeCompare( "Custom URL Map" ) === 0 ) {
-                    activeMapType = supportedMapTypes[i_type]
-                }
-            }
-        }
+//        Component.onCompleted: {
+//            for( var i_type in supportedMapTypes ) {
+//                if( supportedMapTypes[i_type].name.localeCompare( "Custom URL Map" ) === 0 ) {
+//                    activeMapType = supportedMapTypes[i_type]
+//                }
+//            }
+//        }
     }
 
     Map {
@@ -84,7 +84,7 @@ Rectangle {
 
                 sourceItem: Rectangle {
                     id: rectCity
-                    color: model.color
+                    color: normaledColor(model.color, model.additionalColor, model.minParamValue, model.maxParamValue, model.value)
                     radius: model.radius
                     width: radius * 2
                     height: radius * 2
@@ -113,9 +113,9 @@ Rectangle {
 
             delegate: MapQuickItem {
                 id: mqiStops
-                coordinate: QtPositioning.coordinate(model.latitude_city, model.longitude_city)
-                anchorPoint.x: rectCity.width / 2
-                anchorPoint.y: rectCity.height / 2
+                coordinate: QtPositioning.coordinate(model.latitude_bus, model.longitude_bus)
+                anchorPoint.x: rectStop.width / 2
+                anchorPoint.y: rectStop.height / 2
 
                 sourceItem: Rectangle {
                     id: rectStop
@@ -136,9 +136,9 @@ Rectangle {
 
             delegate: MapQuickItem {
                 id: mqiPorts
-                coordinate: QtPositioning.coordinate(model.latitude_city, model.longitude_city)
-                anchorPoint.x: rectCity.width / 2
-                anchorPoint.y: rectCity.height / 2
+                coordinate: QtPositioning.coordinate(model.latitude_boat, model.longitude_boat)
+                anchorPoint.x: rectPort.width / 2
+                anchorPoint.y: rectPort.height / 2
 
                 sourceItem: Rectangle {
                     id: rectPort
@@ -159,9 +159,9 @@ Rectangle {
 
             delegate: MapQuickItem {
                 id: mqiTrainStations
-                coordinate: QtPositioning.coordinate(model.latitude_city, model.longitude_city)
-                anchorPoint.x: rectCity.width / 2
-                anchorPoint.y: rectCity.height / 2
+                coordinate: QtPositioning.coordinate(model.latitude_rail, model.longitude_rail)
+                anchorPoint.x: rectTrainStation.width / 2
+                anchorPoint.y: rectTrainStation.height / 2
 
                 sourceItem: Rectangle {
                     id: rectTrainStation
@@ -212,7 +212,7 @@ Rectangle {
                 sourceItem: Rectangle {
                     id: rectFinance
                     color: model.color
-                    radius: (model.model.radius - 10) * (model.summa / 25000) + 10
+                    radius: (model.model.radius - 10) * (model.summa / model.maxParamValue) + 10
                     width: radius * 2
                     height: radius * 2
                     border.width: 1
@@ -355,4 +355,19 @@ Rectangle {
         }
     }
 
+    function normaledColor(color1, color2, minVal, maxVal, value)
+    {
+        if (color1 === color2) {
+            return color1
+        }
+
+        var n = (value - maxVal) / (maxVal - minVal);
+
+        var r = color1.r * n + color2.r * (1 - n)
+        var g = color1.g * n + color2.g * (1 - n)
+        var b = color1.b * n + color2.b * (1 - n)
+        var a = color1.a * n + color2.a * (1 - n)
+
+        return Qt.rgba(r, g, b, a)
+    }
 }

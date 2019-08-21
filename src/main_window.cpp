@@ -45,13 +45,13 @@ void MainWindow::initDatabase()
 {
     m_database = QSqlDatabase::addDatabase("QPSQL");
 
-    m_database.setHostName("127.0.0.1");
-    m_database.setDatabaseName("Test");
-    m_database.setUserName("postgres");
-    m_database.setPassword("privet1992");
+    m_database.setHostName(m_databaseHostName);
+    m_database.setDatabaseName(m_databaseDatabaseName);
+    m_database.setUserName(m_databaseUserName);
+    m_database.setPassword(m_databasePassword);
 
-    if (m_database.open()) {
-        return;
+    if (!m_database.open()) {
+        // show window for open db
     }
 }
 
@@ -177,6 +177,7 @@ void MainWindow::paintMainObjects()
         QColor        color       = state.financingColor;
         QColor        borderColor = colorWithoutAlpha(color);
         SqlQueryModel model;
+        model.setMaxParamValue(25000); // TODO взять из БД максимальное значение
         model.setRadius(50);
         model.setColor(color);
         model.setBorderColor(borderColor);
@@ -224,11 +225,12 @@ void MainWindow::paintAdditionalObjects()
     makeCitiesQuery(state, citiesQuery, stopsQuery, portsQuery, trainStationsQuery);
 
     if (citiesQuery.length() > 0) {
-        QColor        color       = state.citiesColor;
+        QColor        color       = state.citiesColor1;
         QColor        borderColor = colorWithoutAlpha(color);
         SqlQueryModel model;
         model.setRadius(4);
         model.setColor(color);
+        model.setAdditionalColor(color); // TODO set color2 != color1
         model.setBorderColor(borderColor);
         model.setQuery(citiesQuery, m_database);
         m_mapScene->rootContext()->setContextProperty("cities_model", &model);
@@ -289,35 +291,32 @@ void MainWindow::paintGraphPopulation()
     query += "TIM.year = " + QString::number(state.year) + ")";
     query += "GROUP BY TIM.tax_social_avg ORDER BY TIM.tax_social_avg ASC";
 
-    QSqlQuery sqlquery(query, m_database);
+    QSqlQuery       sqlQuery(query, m_database);
+    QVector<double> taxAvg, population;
 
-    QVector<double> x, y;
-
-    sqlquery.exec(query);
-    while (sqlquery.next()) {
-        double val0 = sqlquery.value(0).toDouble();
-        double val1 = sqlquery.value(1).toDouble();
+    sqlQuery.exec(query);
+    while (sqlQuery.next()) {
+        double val0 = sqlQuery.value(0).toDouble();
+        double val1 = sqlQuery.value(1).toDouble();
         if (std::isnan(val0) || std::isnan(val1) || std::isinf(val0) || std::isinf(val1)) {
             continue;
         }
-        x.append(val0);
-        y.append(val1 / 1000000.0);
+        taxAvg.append(val0);
+        population.append(val1 / 1000000.0);
     }
-    if (x.count() < 3 || y.count() < 3) {
+
+    if (taxAvg.count() < 3 || population.count() < 3) {
         return;
     }
-    x.removeLast();
-    y.removeLast();
-
-    QPen pen(Qt::red);
-    pen.setWidthF(1.0);
+    taxAvg.removeLast();
+    population.removeLast();
 
     if (m_graphWindow->sheetCount() < 2) {
         m_graphWindow->setSheetCount(2);
     }
-    m_graphWindow->sheet(0).setTitleLabel("Графики");
-    m_graphWindow->sheet(0).setSubTitleLabel("год: " + QString::number(state.year));
-    m_graphWindow->sheet(0).addCurve(x, y, "популяция, млн.", pen);
+    m_graphWindow->sheet(0).setTitleLabel(tr("Графики"));
+    m_graphWindow->sheet(0).setSubTitleLabel(tr("год: ") + QString::number(state.year));
+    m_graphWindow->sheet(0).addCurve(taxAvg, population, tr("популяция, млн."), QPen(Qt::red));
     m_graphWindow->updatePlotter();
     m_graphWindow->show();
 }
@@ -343,36 +342,33 @@ void MainWindow::paintGraph()
     query += "TIM.year = " + QString::number(state.year) + ")";
     query += "GROUP BY TIM.tax_social_avg ORDER BY TIM.tax_social_avg ASC";
 
-    QSqlQuery sqlquery(query, m_database);
+    QSqlQuery       sqlQuery(query, m_database);
+    QVector<double> taxAvg, citiesCount;
 
-    QVector<double> x, y;
-
-    sqlquery.exec(query);
-    while (sqlquery.next()) {
-        double val0 = sqlquery.value(0).toDouble();
-        double val1 = sqlquery.value(1).toDouble();
+    sqlQuery.exec(query);
+    while (sqlQuery.next()) {
+        double val0 = sqlQuery.value(0).toDouble();
+        double val1 = sqlQuery.value(1).toDouble();
         if (std::isnan(val0) || std::isnan(val1) || std::isinf(val0) || std::isinf(val1)) {
             continue;
         }
-        x.append(val0);
-        y.append(val1);
+        taxAvg.append(val0);
+        citiesCount.append(val1);
     }
-    if (x.count() < 3 || y.count() < 3) {
+
+    if (taxAvg.count() < 3 || citiesCount.count() < 3) {
         return;
     }
-    x.removeLast();
-    y.removeLast();
-
-    QPen pen(Qt::blue);
-    pen.setWidthF(1.0);
+    taxAvg.removeLast();
+    citiesCount.removeLast();
 
     if (m_graphWindow->sheetCount() < 2) {
         m_graphWindow->setSheetCount(2);
     }
-    m_graphWindow->sheet(1).setTitleLabel("Графики");
-    m_graphWindow->sheet(1).setSubTitleLabel("год: " + QString::number(state.year));
-    m_graphWindow->sheet(1).setXLabel("средние доходы");
-    m_graphWindow->sheet(1).addCurve(x, y, "количество н.п.", pen);
+    m_graphWindow->sheet(1).setTitleLabel(tr("Графики"));
+    m_graphWindow->sheet(1).setSubTitleLabel(tr("год: ") + QString::number(state.year));
+    m_graphWindow->sheet(1).setXLabel(tr("средние доходы"));
+    m_graphWindow->sheet(1).addCurve(taxAvg, citiesCount, tr("количество н.п."), QPen(Qt::blue));
     m_graphWindow->updatePlotter();
     m_graphWindow->show();
 }
@@ -389,19 +385,62 @@ void MainWindow::makeCitiesQuery(const StateOfParameters &state, QString &cities
         return;
     }
 
-    citiesQuery += "SELECT TLC.name_city, TLC.latitude_city, TLC.longitude_city ";
-    citiesQuery += "FROM tab_local_cities AS TLC ";
-
-    citiesQuery += "INNER JOIN tab_municipal_areas AS TMA ON TLC.id_oktmo_municip = TMA.id_oktmo_municip ";
-    citiesQuery += "INNER JOIN tab_areas AS TA ON TMA.id_oktmo_area = TA.id_oktmo_area ";
-    citiesQuery += "INNER JOIN tab_federal_areas AS TFA ON TA.id_fed_area = TFA.id_fed_area WHERE (";
+    QString where = "";
     for (int i = 0; i < state.regionList.count(); i++) {
-        citiesQuery += "TA.name_area = '" + state.regionList.at(i) + "' ";
+        where += "TA.name_area = '" + state.regionList.at(i) + "' ";
         if (i < state.regionList.count() - 1) {
-            citiesQuery += "OR ";
+            where += "OR ";
         }
     }
-    citiesQuery += ")";
+
+    if (state.cities) {
+        citiesQuery += "SELECT TLC.name_city, TLC.latitude_city, TLC.longitude_city ";
+        citiesQuery += "FROM tab_local_cities AS TLC ";
+        citiesQuery += "INNER JOIN tab_municipal_areas AS TMA ON TLC.id_oktmo_municip = TMA.id_oktmo_municip ";
+        citiesQuery += "INNER JOIN tab_areas AS TA ON TMA.id_oktmo_area = TA.id_oktmo_area ";
+        citiesQuery += "INNER JOIN tab_federal_areas AS TFA ON TA.id_fed_area = TFA.id_fed_area WHERE (";
+        citiesQuery += where;
+        citiesQuery += ")";
+    }
+
+    if (state.stops) {
+        stopsQuery += "SELECT  t2.name_bus_station, t2.latitude_bus, t2.longitude_bus FROM (SELECT tlc.latitude_city, ";
+        stopsQuery += "tlc.longitude_city FROM tab_local_cities as tlc ";
+        stopsQuery += "INNER JOIN  tab_municipal_areas as tma on tlc.id_oktmo_municip=tma.id_oktmo_municip ";
+        stopsQuery += "INNER JOIN tab_areas as ta on tma.id_oktmo_area= ta.id_oktmo_area WHERE(";
+        stopsQuery += where;
+        stopsQuery += ")) as t1, tab_bus_stations as t2 where ";
+        stopsQuery += "(6371*acos(sind(t2.latitude_bus)*sind(t1.latitude_city)+cosd(t2.latitude_bus)*";
+        stopsQuery += "cosd(t1.latitude_city)*cosd(t2.longitude_bus - t1.longitude_city)) ) < ";
+        stopsQuery += QString::number(state.radius);
+        stopsQuery += " GROUP BY t2.name_bus_station, t2.latitude_bus, t2.longitude_bus";
+    }
+
+    if (state.ports) {
+        portsQuery += "SELECT  t2.name_boat_station, t2.latitude_boat, t2.longitude_boat FROM ";
+        portsQuery += "(SELECT tlc.latitude_city, tlc.longitude_city FROM tab_local_cities as tlc ";
+        portsQuery += "INNER JOIN  tab_municipal_areas as tma on tlc.id_oktmo_municip=tma.id_oktmo_municip ";
+        portsQuery += "INNER JOIN tab_areas as ta on tma.id_oktmo_area= ta.id_oktmo_area WHERE(";
+        portsQuery += where;
+        portsQuery += ")) as t1, tab_boat_stations as t2 where ";
+        portsQuery += "(6371*acos(sind(t2.latitude_boat)*sind(t1.latitude_city)+cosd(t2.latitude_boat)*";
+        portsQuery += "cosd(t1.latitude_city)*cosd(t2.longitude_boat - t1.longitude_city)) ) < ";
+        portsQuery += QString::number(state.radius);
+        portsQuery += " GROUP BY t2.name_boat_station, t2.latitude_boat, t2.longitude_boat";
+    }
+
+    if (state.trainStations) {
+        trainStationsQuery += "SELECT  t2.station_name, t2.latitude_rail, t2.longitude_rail FROM (SELECT ";
+        trainStationsQuery += "tlc.latitude_city, tlc.longitude_city FROM tab_local_cities as tlc ";
+        trainStationsQuery += "INNER JOIN  tab_municipal_areas as tma on tlc.id_oktmo_municip=tma.id_oktmo_municip ";
+        trainStationsQuery += "INNER JOIN tab_areas as ta on tma.id_oktmo_area= ta.id_oktmo_area WHERE(";
+        trainStationsQuery += where;
+        trainStationsQuery += ")) as t1, tab_rail_stations as t2 where ";
+        trainStationsQuery += "(6371*acos(sind(t2.latitude_rail)*sind(t1.latitude_city)+cosd(t2.latitude_rail)*cosd(";
+        trainStationsQuery += "t1.latitude_city)*cosd(t2.longitude_rail - t1.longitude_city)) ) < ";
+        trainStationsQuery += QString::number(state.radius);
+        trainStationsQuery += " GROUP BY t2.station_name, t2.latitude_rail, t2.longitude_rail";
+    }
 }
 
 void MainWindow::makeFinancingQuery(const StateOfParameters &state, QString &financingQuery)
@@ -418,8 +457,8 @@ void MainWindow::makeFinancingQuery(const StateOfParameters &state, QString &fin
     if (state.budget) {
         financingQuery += "WHERE TE.extrabudget_mil_rub::numeric <= 0 ";
     }
-    financingQuery +=
-        "GROUP BY TA.name_ru, TA.air_latitude, TA.air_longitude, TE.budget_mil_rub, TE.extrabudget_mil_rub ";
+    financingQuery += "GROUP BY TA.name_ru, TA.air_latitude, TA.air_longitude, ";
+    financingQuery += "TE.budget_mil_rub, TE.extrabudget_mil_rub ";
 }
 
 void MainWindow::makeAirpotsAndHeliportsQuery(const StateOfParameters &state, QString &airportsQuery,

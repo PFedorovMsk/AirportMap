@@ -12,7 +12,8 @@ ControlPanel::ControlPanel(QWidget *parent)
 
     ui->btnAirportsColor->setColor(m_state.airportsColor);
     ui->btnHeliportsColor->setColor(m_state.heliportsColor);
-    ui->btnCitiesColor->setColor(m_state.citiesColor);
+    ui->btnCitiesColor->setColor(m_state.citiesColor1);
+    ui->btnCitiesColor2->setColor(m_state.citiesColor2);
     ui->btnFinancingColor->setColor(m_state.financingColor);
     ui->btnStopsColor->setColor(m_state.stopsColor);
     ui->btnPortsColor->setColor(m_state.portsColor);
@@ -133,7 +134,12 @@ void ControlPanel::on_btnFinancingColor_clicked()
 
 void ControlPanel::on_btnCitiesColor_clicked()
 {
-    m_state.citiesColor = ui->btnCitiesColor->color();
+    m_state.citiesColor1 = ui->btnCitiesColor->color();
+}
+
+void ControlPanel::on_btnCitiesColor2_clicked()
+{
+    m_state.citiesColor2 = ui->btnCitiesColor2->color();
 }
 
 void ControlPanel::on_btnStopsColor_clicked()

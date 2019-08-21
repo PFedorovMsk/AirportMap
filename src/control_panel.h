@@ -69,6 +69,8 @@ private slots:
     void on_sbYear_valueChanged(int year);
     void on_sbRadius_valueChanged(int radius);
 
+    void on_btnCitiesColor2_clicked();
+
 private:
     Ui::ControlPanel *ui;
     StateOfParameters m_state;
