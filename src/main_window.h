@@ -41,6 +41,8 @@ private:
     void initLayouts();
     void initScreenRect();
     void initGraphWindow();
+    void makeGraphData(const QVector<double> &xData, const QVector<double> &yData, QVector<double> &xResult,
+                       QVector<double> &yResult, double xStep);
 
 private slots:
     void insertRow();

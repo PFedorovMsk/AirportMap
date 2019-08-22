@@ -44,7 +44,6 @@ public:
     //! \brief Обновляет поле рисовальщика QCustomPlot (заставляет перерисовать себя).
     void updatePlotter();
 
-
 public slots:
     //! \brief Удаляет пользовательские данные, устанавливает значения по-умолчанию.
     void onClear();

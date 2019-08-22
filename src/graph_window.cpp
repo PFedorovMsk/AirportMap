@@ -126,9 +126,9 @@ void GraphWindow::initPlotter()
     connect(m_plotter->xAxis, SIGNAL(rangeChanged(QCPRange)), m_plotter->xAxis2, SLOT(setRange(QCPRange)));
     connect(m_plotter->yAxis, SIGNAL(rangeChanged(QCPRange)), m_plotter->yAxis2, SLOT(setRange(QCPRange)));
 
-    QFontMetrics *metric = new QFontMetrics(m_plotterSubTitleFont);
-    int minWidth = metric->horizontalAdvance(tr("шаг интегрирования 0.0001, между измерениями 9999.9999"));
-    int minHeight = int(0.6 * minWidth);
+    QFontMetrics *metric    = new QFontMetrics(m_plotterSubTitleFont);
+    int           minWidth  = metric->horizontalAdvance(tr("шаг интегрирования 0.0001, между измерениями 9999.9999"));
+    int           minHeight = int(0.6 * minWidth);
 
     m_plotter->setMinimumWidth(minWidth);
     m_plotter->setMinimumHeight(minHeight);

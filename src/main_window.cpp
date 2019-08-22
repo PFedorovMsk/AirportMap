@@ -320,6 +320,42 @@ void MainWindow::paintAdditionalObjects()
     }
 }
 
+void MainWindow::makeGraphData(const QVector<double> &xData, const QVector<double> &yData, QVector<double> &xResult,
+                               QVector<double> &yResult, double xStep)
+{
+    QVector<double> intervals;
+    QVector<double> values;
+
+    for (double tax = 0.0; tax < xData.last() + xStep; tax += xStep) {
+        intervals.append(tax);
+    }
+
+    values.resize(intervals.count());
+    int index = 0;
+
+    for (int i = 0; i < intervals.count() - 1; i++) {
+        double value = 0;
+        for (int j = index; j < xData.count(); j++) {
+            if (xData[j] < intervals[i + 1]) {
+                value += yData[j];
+            } else {
+                index = j;
+                break;
+            }
+        }
+        values[i + 1] = value;
+    }
+
+    xResult.append(intervals[0]);
+    yResult.append(values[1]);
+    for (int i = 1; i < intervals.count() - 1; i++) {
+        xResult.append(intervals[i]);
+        yResult.append(values[i]);
+        xResult.append(intervals[i]);
+        yResult.append(values[i + 1]);
+    }
+}
+
 void MainWindow::paintGraphPopulation()
 {
     StateOfParameters state = m_controlPanel->state();
@@ -330,6 +366,7 @@ void MainWindow::paintGraphPopulation()
     QSqlQuery       sqlQuery("", m_database);
     QVector<double> taxAvg, population;
 
+    qDebug() << QueryMaker::instance().selectPopulationAndTax(state);
     sqlQuery.exec(QueryMaker::instance().selectPopulationAndTax(state));
     while (sqlQuery.next()) {
         double val0 = sqlQuery.value(0).toDouble();
@@ -347,12 +384,19 @@ void MainWindow::paintGraphPopulation()
     taxAvg.removeLast();
     population.removeLast();
 
+    QVector<double> x, y;
+    makeGraphData(taxAvg, population, x, y, 100000);
+
+    QPen pen(Qt::red);
+    pen.setWidthF(2.0);
+
     if (m_graphWindow->sheetCount() < 2) {
         m_graphWindow->setSheetCount(2);
     }
     m_graphWindow->sheet(0).setTitleLabel(tr("Графики"));
-    m_graphWindow->sheet(0).setSubTitleLabel(tr("год: ") + QString::number(state.year));
-    m_graphWindow->sheet(0).addCurve(taxAvg, population, tr("популяция, млн."), QPen(Qt::red));
+    m_graphWindow->sheet(0).setSubTitleLabel(tr("количество людей с данными средними доходами"));
+    m_graphWindow->sheet(0).addCurve(x, y, tr("популяция, млн."), pen);
+    m_graphWindow->sheet(0).setXLabel(tr("средние доходы, руб."));
     m_graphWindow->updatePlotter();
     m_graphWindow->show();
 }
@@ -384,13 +428,19 @@ void MainWindow::paintGraph()
     taxAvg.removeLast();
     citiesCount.removeLast();
 
+    QVector<double> x, y;
+    makeGraphData(taxAvg, citiesCount, x, y, 100000);
+
+    QPen pen(Qt::blue);
+    pen.setWidthF(2.0);
+
     if (m_graphWindow->sheetCount() < 2) {
         m_graphWindow->setSheetCount(2);
     }
-    m_graphWindow->sheet(1).setTitleLabel(tr("Графики"));
-    m_graphWindow->sheet(1).setSubTitleLabel(tr("год: ") + QString::number(state.year));
-    m_graphWindow->sheet(1).setXLabel(tr("средние доходы"));
-    m_graphWindow->sheet(1).addCurve(taxAvg, citiesCount, tr("количество н.п."), QPen(Qt::blue));
+    m_graphWindow->sheet(1).setTitleLabel(tr("График"));
+    m_graphWindow->sheet(1).setSubTitleLabel(tr("количество населенных пунктов с данными средними доходами"));
+    m_graphWindow->sheet(1).setXLabel(tr("средние доходы, руб."));
+    m_graphWindow->sheet(1).addCurve(x, y, tr("количество н.п."), pen);
     m_graphWindow->updatePlotter();
     m_graphWindow->show();
 }
