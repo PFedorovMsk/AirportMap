@@ -27,7 +27,7 @@ SOURCES += \
     src/query_maker.cpp \
     src/sql_query_model.cpp \
     src/state_of_parameters.cpp \
-    third_party/qcustomplot/qcustomplot.cc
+    third_party/qcustomplot/qcustomplot.cpp
 
 HEADERS += \
     src/color_select_button.h \
