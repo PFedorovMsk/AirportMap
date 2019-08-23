@@ -60,7 +60,37 @@ void MainWindow::initDatabase()
     m_database.setPassword(m_databasePassword);
 
     if (!m_database.open()) {
-        // show window for open db
+        QFile file(QCoreApplication::applicationDirPath() + "/AirportMap.ini");
+        if (file.open(QFile::ReadOnly)) {
+            QByteArray hostName         = file.readLine();
+            QByteArray databaseName     = file.readLine();
+            QByteArray userName         = file.readLine();
+            QByteArray databasePassword = file.readLine();
+
+            // последние 2 символа - \r\n - добавляются при переносе строки, удаляю:
+            hostName.resize(hostName.size() - 2);
+            databaseName.resize(databaseName.size() - 2);
+            userName.resize(userName.size() - 2);
+
+            m_database.setHostName(QString::fromStdString(hostName.toStdString()));
+            m_database.setDatabaseName(QString::fromStdString(databaseName.toStdString()));
+            m_database.setUserName(QString::fromStdString(userName.toStdString()));
+            m_database.setPassword(QString::fromStdString(databasePassword.toStdString()));
+        }
+        file.close();
+
+        if (!m_database.open()) {
+            QMessageBox msgBox;
+            msgBox.setText(tr("Ошибка!"));
+            msgBox.setInformativeText(tr("Не удалось подключиться к базе данных"));
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            int res = msgBox.exec();
+            if (res == QMessageBox::Ok) {
+                QApplication::exit();
+            }
+        }
     }
 }
 
@@ -320,14 +350,22 @@ void MainWindow::paintAdditionalObjects()
     }
 }
 
-void MainWindow::makeGraphData(const QVector<double> &xData, const QVector<double> &yData, QVector<double> &xResult,
-                               QVector<double> &yResult, double xStep)
+void MainWindow::makeGraphData(const QVector<double> &xData, const QVector<double> &yData,
+                               QVector<QVector<double>> &xResult, QVector<QVector<double>> &yResult)
 {
     QVector<double> intervals;
     QVector<double> values;
 
-    for (double tax = 0.0; tax < xData.last() + xStep; tax += xStep) {
-        intervals.append(tax);
+    double step  = xData.last() / 10;
+    long   lStep = long(step);
+    while (lStep % 5000 != 0) {
+        lStep++;
+    }
+    step        = double(lStep);
+    double xMax = step * 10;
+
+    for (double x = 0.0; x < xMax + step; x += step) {
+        intervals.append(x);
     }
 
     values.resize(intervals.count());
@@ -346,13 +384,25 @@ void MainWindow::makeGraphData(const QVector<double> &xData, const QVector<doubl
         values[i + 1] = value;
     }
 
-    xResult.append(intervals[0]);
-    yResult.append(values[1]);
-    for (int i = 1; i < intervals.count() - 1; i++) {
-        xResult.append(intervals[i]);
-        yResult.append(values[i]);
-        xResult.append(intervals[i]);
-        yResult.append(values[i + 1]);
+    if (intervals.count() % 2 != 0) {
+        intervals.append(intervals.last() + step);
+        values.append(values.last());
+    }
+
+    QVector<double> x(4), y(4);
+    for (int i = 0; i < intervals.count() - 1; i++) {
+        x[0] = intervals[i];
+        x[1] = intervals[i];
+        x[2] = intervals[i + 1];
+        x[3] = intervals[i + 1];
+
+        y[0] = 0;
+        y[1] = values[i + 1];
+        y[2] = values[i + 1];
+        y[3] = 0;
+
+        xResult.append(x);
+        yResult.append(y);
     }
 }
 
@@ -366,7 +416,6 @@ void MainWindow::paintGraphPopulation()
     QSqlQuery       sqlQuery("", m_database);
     QVector<double> taxAvg, population;
 
-    qDebug() << QueryMaker::instance().selectPopulationAndTax(state);
     sqlQuery.exec(QueryMaker::instance().selectPopulationAndTax(state));
     while (sqlQuery.next()) {
         double val0 = sqlQuery.value(0).toDouble();
@@ -384,18 +433,23 @@ void MainWindow::paintGraphPopulation()
     taxAvg.removeLast();
     population.removeLast();
 
-    QVector<double> x, y;
-    makeGraphData(taxAvg, population, x, y, 100000);
+    QVector<QVector<double>> x, y;
+    makeGraphData(taxAvg, population, x, y);
 
-    QPen pen(Qt::red);
-    pen.setWidthF(2.0);
+    QPen pen1(Qt::red);
+    pen1.setWidthF(2.0);
+    QPen pen2(Qt::darkRed);
+    pen2.setWidthF(2.0);
 
     if (m_graphWindow->sheetCount() < 2) {
         m_graphWindow->setSheetCount(2);
     }
     m_graphWindow->sheet(0).setTitleLabel(tr("Графики"));
     m_graphWindow->sheet(0).setSubTitleLabel(tr("количество людей с данными средними доходами"));
-    m_graphWindow->sheet(0).addCurve(x, y, tr("популяция, млн."), pen);
+    for (int i = 0; i < x.count(); i++) {
+        QString name = "[" + QString::number(x[i].first()) + ", " + QString::number(x[i].last()) + ")";
+        m_graphWindow->sheet(0).addCurve(x[i], y[i], name, i % 2 == 0 ? pen1 : pen2);
+    }
     m_graphWindow->sheet(0).setXLabel(tr("средние доходы, руб."));
     m_graphWindow->updatePlotter();
     m_graphWindow->show();
@@ -428,11 +482,13 @@ void MainWindow::paintGraph()
     taxAvg.removeLast();
     citiesCount.removeLast();
 
-    QVector<double> x, y;
-    makeGraphData(taxAvg, citiesCount, x, y, 100000);
+    QVector<QVector<double>> x, y;
+    makeGraphData(taxAvg, citiesCount, x, y);
 
-    QPen pen(Qt::blue);
-    pen.setWidthF(2.0);
+    QPen pen1(Qt::blue);
+    pen1.setWidthF(2.0);
+    QPen pen2(Qt::darkBlue);
+    pen2.setWidthF(2.0);
 
     if (m_graphWindow->sheetCount() < 2) {
         m_graphWindow->setSheetCount(2);
@@ -440,7 +496,10 @@ void MainWindow::paintGraph()
     m_graphWindow->sheet(1).setTitleLabel(tr("График"));
     m_graphWindow->sheet(1).setSubTitleLabel(tr("количество населенных пунктов с данными средними доходами"));
     m_graphWindow->sheet(1).setXLabel(tr("средние доходы, руб."));
-    m_graphWindow->sheet(1).addCurve(x, y, tr("количество н.п."), pen);
+    for (int i = 0; i < x.count(); i++) {
+        QString name = "[" + QString::number(x[i].first()) + ", " + QString::number(x[i].last()) + ")";
+        m_graphWindow->sheet(1).addCurve(x[i], y[i], name, i % 2 == 0 ? pen1 : pen2);
+    }
     m_graphWindow->updatePlotter();
     m_graphWindow->show();
 }

@@ -443,6 +443,9 @@ void GraphWindow::updatePlotter()
         m_plotter->addGraph();
         m_plotter->graph(j)->setData(m_currentSheet->curves()[i].x, m_currentSheet->curves()[i].y);
         m_plotter->graph(j)->setPen(m_currentSheet->curves()[i].pen);
+        QColor color = m_currentSheet->curves()[i].pen.color();
+        color.setAlpha(128);
+        m_plotter->graph(j)->setBrush(QBrush(color));
         m_plotter->graph(j)->setName(m_currentSheet->curves()[i].fullName());
         m_plotter->graph(j)->setAntialiased(true);
         m_plotter->graph(j)->setAdaptiveSampling(true);

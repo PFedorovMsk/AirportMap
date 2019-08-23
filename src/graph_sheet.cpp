@@ -183,8 +183,8 @@ void GraphSheet::calcRanges()
     double xd = (xmax - xmin) * 0.005;
     double yd = (ymax - ymin) * 0.005;
 
-    m_axisRange.xMin = xmin - xd;
-    m_axisRange.xMax = xmax + xd;
+    m_axisRange.xMin = xmin - 4 * xd;
+    m_axisRange.xMax = xmax + 4 * xd;
     m_axisRange.yMin = ymin - yd;
-    m_axisRange.yMax = ymax + yd;
+    m_axisRange.yMax = ymax + 10 * yd;
 }

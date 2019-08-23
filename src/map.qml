@@ -18,17 +18,17 @@ Rectangle {
     Plugin {
         id: mapBasePlugin
         name: "osm"
-//        PluginParameter {
-//            name: "osm.mapping.providersrepository.disabled"
-//            value: true
-//        }
-//        PluginParameter {
-//            name: "osm.mapping.custom.host"
-//            value: "file:///D:/Tiles/"
-//        }
+        PluginParameter {
+            name: "osm.mapping.providersrepository.disabled"
+            value: true
+        }
+        PluginParameter {
+            name: "osm.mapping.custom.host"
+            value: "file:///C:/Tiles/"
+        }
 //        PluginParameter {
 //            name: "osm.mapping.cache.directory"
-//            value: "file:///D:/Tiles/"
+//            value: "file:///C:/Tiles/"
 //        }
     }
 
@@ -41,13 +41,13 @@ Rectangle {
         z: parent.z + 1
         plugin: mapBasePlugin
 
-//        Component.onCompleted: {
-//            for( var i_type in supportedMapTypes ) {
-//                if( supportedMapTypes[i_type].name.localeCompare( "Custom URL Map" ) === 0 ) {
-//                    activeMapType = supportedMapTypes[i_type]
-//                }
-//            }
-//        }
+        Component.onCompleted: {
+            for( var i_type in supportedMapTypes ) {
+                if( supportedMapTypes[i_type].name.localeCompare( "Custom URL Map" ) === 0 ) {
+                    activeMapType = supportedMapTypes[i_type]
+                }
+            }
+        }
     }
 
     Map {
