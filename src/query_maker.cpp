@@ -26,13 +26,16 @@ QString QueryMaker::selectPopulationAndTax(const StateOfParameters &state) const
     query += "INNER JOIN tab_areas AS TA ON TMA.id_oktmo_area = TA.id_oktmo_area ";
     query += "INNER JOIN tab_federal_areas AS TFA ON TA.id_fed_area = TFA.id_fed_area ";
     query += "INNER JOIN tab_indic_municipal AS TIM ON TMA.id_oktmo_municip = TIM.id_oktmo_municip ";
-    query += "INNER JOIN tab_indic_cities AS TIC ON TLC.id_oktmo_city = TIC.id_oktmo_city WHERE (";
+    query += "INNER JOIN tab_indic_cities AS TIC ON TLC.id_oktmo_city = TIC.id_oktmo_city WHERE ((";
 
     for (int i = 0; i < state.regionList.count(); i++) {
-        query += "TA.name_area ='" + state.regionList.at(i) + "' OR ";
+        query += "TA.name_area ='" + state.regionList.at(i);
+        if (i < state.regionList.count() - 1) {
+            query +=  "' OR ";
+        }
     }
 
-    query += "TIM.year = " + QString::number(state.year) + ")";
+    query += "') AND TIM.year = " + QString::number(state.year) + ")";
     query += "GROUP BY TIM.tax_social_avg ORDER BY TIM.tax_social_avg ASC";
 
     return query;
@@ -47,13 +50,16 @@ QString QueryMaker::selectCitiesAndTax(const StateOfParameters &state) const
     query += "INNER JOIN tab_areas AS TA ON TMA.id_oktmo_area = TA.id_oktmo_area ";
     query += "INNER JOIN tab_federal_areas AS TFA ON TA.id_fed_area = TFA.id_fed_area ";
     query += "INNER JOIN tab_indic_municipal AS TIM ON TMA.id_oktmo_municip = TIM.id_oktmo_municip ";
-    query += "INNER JOIN tab_indic_cities AS TIC ON TLC.id_oktmo_city = TIC.id_oktmo_city WHERE (";
+    query += "INNER JOIN tab_indic_cities AS TIC ON TLC.id_oktmo_city = TIC.id_oktmo_city WHERE ((";
 
     for (int i = 0; i < state.regionList.count(); i++) {
-        query += "TA.name_area ='" + state.regionList.at(i) + "' OR ";
+        query += "TA.name_area ='" + state.regionList.at(i);
+        if (i < state.regionList.count() - 1) {
+            query +=  "' OR ";
+        }
     }
 
-    query += "TIM.year = " + QString::number(state.year) + ")";
+    query += "') AND TIM.year = " + QString::number(state.year) + ")";
     query += "GROUP BY TIM.tax_social_avg ORDER BY TIM.tax_social_avg ASC";
 
     return query;

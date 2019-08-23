@@ -29,7 +29,7 @@ StateOfParameters::StateOfParameters()
     , stopsColor(QColor(112, 112, 96, 64))
     , portsColor(QColor(0, 0,255, 64))
     , trainStationsColor(QColor(255, 255, 0, 64))
-    , year (2019)
+    , year (2017)
     , radius (10)
 {
 }
