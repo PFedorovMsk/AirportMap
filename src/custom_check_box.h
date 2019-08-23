@@ -9,7 +9,7 @@
 class QTreeWidgetItem;
 
 
-template <typename MyObject, typename WidgetType>
+template<typename MyObject, typename WidgetType>
 void traverseTreeWidgetItem(QTreeWidget *treeWidget, QTreeWidgetItem *treeItem, MyObject object)
 {
     QTreeWidgetItem *childItem  = nullptr;
@@ -36,7 +36,7 @@ void traverseTreeWidgetItem(QTreeWidget *treeWidget, QTreeWidgetItem *treeItem, 
 }
 
 
-template <typename MyObject, typename WidgetType>
+template<typename MyObject, typename WidgetType>
 void traverseTreeWidget(QTreeWidget *treeWidget, MyObject object)
 {
     QTreeWidgetItem *topItem = nullptr;
@@ -56,7 +56,7 @@ class CustomCheckBox : public QCheckBox
     Q_OBJECT
 
 public:
-    CustomCheckBox(QTreeWidgetItem *item);
+    explicit CustomCheckBox(QTreeWidgetItem *item);
 
     QTreeWidgetItem *item() const;
 

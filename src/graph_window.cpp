@@ -288,8 +288,8 @@ void GraphWindow::onClear()
 
 void GraphWindow::onSavePng()
 {
-    QString fileName =
-        QFileDialog::getSaveFileName(this, tr("Сохранить изображение"), QDir::homePath(), tr("Изображение (*.png)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Сохранить изображение"), QDir::homePath(),
+                                                    tr("Изображение (*.png)"));
     m_plotter->savePng(fileName);
 }
 
@@ -367,7 +367,6 @@ void GraphWindow::onShowCurve(QAction *action)
 
     for (int j = 0; j < m_currentSheet->curves().size(); j++) {
         if (m_currentSheet->curves()[j].fullName() == name && m_currentSheet->curves()[j].visible == false) {
-
             m_menuShow->removeAction(action);
             m_currentSheet->setCurveVisible(j, true);
             index = j;

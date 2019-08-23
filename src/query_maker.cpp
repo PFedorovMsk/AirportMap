@@ -31,7 +31,7 @@ QString QueryMaker::selectPopulationAndTax(const StateOfParameters &state) const
     for (int i = 0; i < state.regionList.count(); i++) {
         query += "TA.name_area ='" + state.regionList.at(i);
         if (i < state.regionList.count() - 1) {
-            query +=  "' OR ";
+            query += "' OR ";
         }
     }
 
@@ -55,7 +55,7 @@ QString QueryMaker::selectCitiesAndTax(const StateOfParameters &state) const
     for (int i = 0; i < state.regionList.count(); i++) {
         query += "TA.name_area ='" + state.regionList.at(i);
         if (i < state.regionList.count() - 1) {
-            query +=  "' OR ";
+            query += "' OR ";
         }
     }
 

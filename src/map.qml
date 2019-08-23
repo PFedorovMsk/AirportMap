@@ -11,9 +11,9 @@ Rectangle {
     height: 800
     visible: true
 
-    property variant topLeftRussia:     QtPositioning.coordinate(78.0, 19.0)
+    property variant topLeftRussia: QtPositioning.coordinate(78.0, 19.0)
     property variant bottomRightRussia: QtPositioning.coordinate(41.0, -169.0)
-    property variant viewOfRussia:      QtPositioning.rectangle(topLeftRussia, bottomRightRussia)
+    property variant viewOfRussia: QtPositioning.rectangle(topLeftRussia, bottomRightRussia)
 
     Plugin {
         id: mapBasePlugin
@@ -26,10 +26,10 @@ Rectangle {
             name: "osm.mapping.custom.host"
             value: "file:///C:/Tiles/"
         }
-//        PluginParameter {
-//            name: "osm.mapping.cache.directory"
-//            value: "file:///C:/Tiles/"
-//        }
+        //        PluginParameter {
+        //            name: "osm.mapping.cache.directory"
+        //            value: "file:///C:/Tiles/"
+        //        }
     }
 
     Map {
@@ -42,8 +42,8 @@ Rectangle {
         plugin: mapBasePlugin
 
         Component.onCompleted: {
-            for( var i_type in supportedMapTypes ) {
-                if( supportedMapTypes[i_type].name.localeCompare( "Custom URL Map" ) === 0 ) {
+            for (i_type in supportedMapTypes) {
+                if (supportedMapTypes[i_type].name.localeCompare("Custom URL Map") === 0) {
                     activeMapType = supportedMapTypes[i_type]
                 }
             }
@@ -53,7 +53,9 @@ Rectangle {
     Map {
         id: mapOverlayCities
         anchors.fill: parent
-        plugin: Plugin { name: "itemsoverlay" }
+        plugin: Plugin {
+            name: "itemsoverlay"
+        }
         gesture.enabled: false
         center: mapBase.center
         color: 'transparent'
@@ -64,14 +66,13 @@ Rectangle {
         minimumZoomLevel: mapBase.minimumZoomLevel
         maximumZoomLevel: mapBase.maximumZoomLevel
         zoomLevel: mapBase.zoomLevel
-        tilt: mapBase.tilt;
+        tilt: mapBase.tilt
         bearing: mapBase.bearing
         fieldOfView: mapBase.fieldOfView
         z: mapBase.z + 1
         layer.enabled: true
 
         // Рисуем города:
-
         MapItemView {
             id: citiesView
             model: cities_model
@@ -102,7 +103,7 @@ Rectangle {
                         text: model.name_city
                     }
                     onEntered: mapOverlayLabels.showLabel(textCityName.text, mapOverlayCities.fromCoordinate(mqiCities.coordinate))
-                    onExited:  mapOverlayLabels.hideLabel()
+                    onExited: mapOverlayLabels.hideLabel()
                 }
             }
         }
@@ -180,7 +181,9 @@ Rectangle {
     Map {
         id: mapOverlayMainObjects
         anchors.fill: parent
-        plugin: Plugin { name: "itemsoverlay" }
+        plugin: Plugin {
+            name: "itemsoverlay"
+        }
         gesture.enabled: false
         center: mapBase.center
         color: 'transparent'
@@ -191,14 +194,13 @@ Rectangle {
         minimumZoomLevel: mapBase.minimumZoomLevel
         maximumZoomLevel: mapBase.maximumZoomLevel
         zoomLevel: mapBase.zoomLevel
-        tilt: mapBase.tilt;
+        tilt: mapBase.tilt
         bearing: mapBase.bearing
         fieldOfView: mapBase.fieldOfView
         z: mapBase.z + 2
         layer.enabled: true
 
         // Рисуем финансирование аэропортов/вертодромов:
-
         MapItemView {
             id: financingView
             model: financing_model
@@ -226,17 +228,16 @@ Rectangle {
                     Text {
                         id: textFinancingName
                         visible: false
-                        text: model.name_ru + " - финансирование:\n -бюджетное: " + model.budget_mil_rub +
-                              " млн.руб\n -внебюджетное: " +  model.extrabudget_mil_rub + " млн.руб"
+                        text: model.name_ru + " - финансирование:\n -бюджетное: " + model.budget_mil_rub
+                              + " млн.руб\n -внебюджетное: " + model.extrabudget_mil_rub + " млн.руб"
                     }
                     onEntered: mapOverlayLabels.showLabel(textFinancingName.text, mapOverlayMainObjects.fromCoordinate(mqiFinancing.coordinate))
-                    onExited:  mapOverlayLabels.hideLabel()
+                    onExited: mapOverlayLabels.hideLabel()
                 }
             }
         }
 
         // Рисуем аэропорты:
-
         MapItemView {
             id: airportsView
             model: airport_model
@@ -266,14 +267,13 @@ Rectangle {
                         visible: false
                         text: model.name_ru
                     }
-                    onEntered: mapOverlayLabels.showLabel(textAirportName.text, mapOverlayMainObjects.fromCoordinate(mqiAirports.coordinate))
-                    onExited:  mapOverlayLabels.hideLabel()
+                    onEntered: mapOverlayLabels.showLabel(extAirportName.text, mapOverlayMainObjects.fromCoordinate(mqiAirports.coordinate))
+                    onExited: mapOverlayLabels.hideLabel()
                 }
             }
         }
 
         // Рисуем вертодромы:
-
         MapItemView {
             id: heliportsView
             model: heliport_model
@@ -304,7 +304,7 @@ Rectangle {
                         text: model.name_ru
                     }
                     onEntered: mapOverlayLabels.showLabel(textHeliportName.text, mapOverlayMainObjects.fromCoordinate(mqiHelipoirts.coordinate))
-                    onExited:  mapOverlayLabels.hideLabel()
+                    onExited: mapOverlayLabels.hideLabel()
                 }
             }
         }
@@ -313,7 +313,9 @@ Rectangle {
     Map {
         id: mapOverlayLabels
         anchors.fill: parent
-        plugin: Plugin { name: "itemsoverlay" }
+        plugin: Plugin {
+            name: "itemsoverlay"
+        }
         gesture.enabled: false
         center: mapBase.center
         color: 'transparent'
@@ -324,7 +326,7 @@ Rectangle {
         minimumZoomLevel: mapBase.minimumZoomLevel
         maximumZoomLevel: mapBase.maximumZoomLevel
         zoomLevel: mapBase.zoomLevel
-        tilt: mapBase.tilt;
+        tilt: mapBase.tilt
         bearing: mapBase.bearing
         fieldOfView: mapBase.fieldOfView
         z: mapBase.z + 3
@@ -341,7 +343,7 @@ Rectangle {
             }
         }
 
-        function showLabel(text, point)
+        function showLabel(textpoint)
         {
             textSum.text = text
             textSum.x = point.x + 25
@@ -355,13 +357,13 @@ Rectangle {
         }
     }
 
-    function normaledColor(color1, color2, minVal, maxVal, value)
+    function normaledColor(color1color2minValmaxValvalue)
     {
         if (color1 === color2) {
             return color1
         }
 
-        var n = (value - maxVal) / (maxVal - minVal);
+        var n = (value - maxVal) / (maxVal - minVal)
 
         var r = color1.r * n + color2.r * (1 - n)
         var g = color1.g * n + color2.g * (1 - n)

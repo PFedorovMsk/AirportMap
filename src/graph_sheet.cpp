@@ -25,9 +25,7 @@ GraphSheet::GraphSheet()
     clear();
 }
 
-GraphSheet::~GraphSheet()
-{
-}
+GraphSheet::~GraphSheet() {}
 
 void GraphSheet::clear()
 {

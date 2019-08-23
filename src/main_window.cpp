@@ -6,7 +6,6 @@
 #include <QScreen>
 #include <QVBoxLayout>
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_graphWindow(new GraphWindow)
@@ -76,8 +75,9 @@ void MainWindow::initDatabase()
             m_database.setDatabaseName(QString::fromStdString(databaseName.toStdString()));
             m_database.setUserName(QString::fromStdString(userName.toStdString()));
             m_database.setPassword(QString::fromStdString(databasePassword.toStdString()));
+
+            file.close();
         }
-        file.close();
 
         if (!m_database.open()) {
             QMessageBox msgBox;
@@ -186,7 +186,6 @@ void MainWindow::initLayouts()
     mainWidget->addTab(tab2Widget, tr("Редактор БД"));
 
     setCentralWidget(mainWidget);
-
 
     int minPanelWidth = m_controlPanel->minimumWidth();
     if (int width = m_databaseEditorPanel->minimumWidth() > minPanelWidth) {
@@ -493,6 +492,7 @@ void MainWindow::paintGraph()
     if (m_graphWindow->sheetCount() < 2) {
         m_graphWindow->setSheetCount(2);
     }
+
     m_graphWindow->sheet(1).setTitleLabel(tr("График"));
     m_graphWindow->sheet(1).setSubTitleLabel(tr("количество населенных пунктов с данными средними доходами"));
     m_graphWindow->sheet(1).setXLabel(tr("средние доходы, руб."));

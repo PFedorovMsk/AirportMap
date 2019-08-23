@@ -100,14 +100,13 @@ void ControlPanel::on_cbTrainStations_toggled(bool checked)
 
 void ControlPanel::on_btnAirportsColor_clicked()
 {
-
     if (m_state.airportsColor == ui->btnAirportsColor->color()) {
         return;
     }
     m_state.airportsColor = ui->btnAirportsColor->color();
     if (ui->cbAirports->isChecked()) {
         emit mainStateChanged();
-    } 
+    }
 }
 
 void ControlPanel::on_btnHeliportsColor_clicked()

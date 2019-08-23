@@ -55,7 +55,6 @@ struct GAxisRange {
 
 class GraphSheet
 {
-
 public:
     //! \brief Конструктор.
     GraphSheet();

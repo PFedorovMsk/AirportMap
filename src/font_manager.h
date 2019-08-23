@@ -11,7 +11,6 @@
 
 class FontManager
 {
-
 public:
     //! \brief Возвращает (единственный) экземпляр FontManager.
     static FontManager &instance();

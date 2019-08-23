@@ -10,8 +10,9 @@ int main(int argc, char *argv[])
 
     QString     locale = QLocale::system().name();
     QTranslator qtTranslator;
-    if (qtTranslator.load("qt_" + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+    if (qtTranslator.load("qt_" + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath))) {
         app.installTranslator(&qtTranslator);
+    }
 
     MainWindow window;
     window.show();

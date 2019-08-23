@@ -65,7 +65,7 @@ private slots:
     void on_cbStops_toggled(bool checked);
     void on_cbPorts_toggled(bool checked);
     void on_cbTrainStations_toggled(bool checked);
-    void on_btnUpdate_clicked();   
+    void on_btnUpdate_clicked();
     void on_sbYear_valueChanged(int year);
     void on_sbRadius_valueChanged(int radius);
 
